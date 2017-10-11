@@ -10,6 +10,7 @@ preloadState.prototype.preload = function()
     game.load.image('arrow', 'assets/arro.png');
 	game.load.image('deer', 'assets/deer.png');
 	game.load.image('rock', 'assets/rock.png');
+	game.load.image('cow', 'assets/cow.png');
 
 };
 
