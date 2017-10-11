@@ -27,6 +27,7 @@ gameplayState.prototype.create = function()
 	this.arrow = game.add.sprite(32, game.world.height - 64, "arrow");
 	game.physics.enable(this.arrow, Phaser.Physics.ARCADE);
 	this.arrow.body.gravity.y = 0;
+	this.arrow.body.collideWorldBounds = true;
 	
 	//deer stuff
 	this.deers = game.add.group();
@@ -51,15 +52,19 @@ gameplayState.prototype.update = function()
 	if (this.lives > 0){
 		//arrow movement
 		if (game.input.mousePointer.isDown) {
-			if (!isSlowed){
-				mx = game.input.mousePointer.x;
-				this.arrow.body.x += (Math.abs(mx-this.arrow.body.x) < this.arrowSpeed ? 
-					mx-this.arrow.body.x : Math.sign(mx-this.arrow.body.x) * this.arrowSpeed);
+			if (!this.isSlowed){
+				let mouseX = game.input.mousePointer.x;
+				let dist = mouseX - this.arrow.body.x;
+				let speed = this.arrowSpeed * Math.abs(dist)/70 * Math.sign(dist);
+				this.arrow.body.x += speed;
+				console.log(speed);
 			}
-			else if (isSlowed){
-				mx = game.input.mousePointer.x;
-				this.arrow.body.x += (Math.abs(mx-this.arrow.body.x) < this.arrowSpeed/2 ? 
-					mx-this.arrow.body.x : Math.sign(mx-this.arrow.body.x) * this.arrowSpeed/2);
+			else if (this.isSlowed){
+				let mouseX = game.input.mousePointer.x;
+				let dist = mouseX - this.arrow.body.x;
+				let speed = this.arrowSpeed/2 * Math.abs(dist)/70 * Math.sign(dist);
+				this.arrow.body.x += speed;
+				console.log(speed);
 			}
 		}
 		
@@ -86,6 +91,13 @@ gameplayState.prototype.update = function()
 		}
 		this.cowTimer = this.cowTimer + game.time.elapsed;
 		
+		if (this.slowDownTimer >= 5000) {
+			this.isSlowed = 0;
+			this.slowDownTimer = 0;
+		}
+		else {
+			this.slowDownTimer += game.time.elapsed;
+		}
 		
 		//update score
 		game.physics.arcade.overlap(this.arrow, this.deers, this.updateScore, null, this);
@@ -98,7 +110,7 @@ gameplayState.prototype.update = function()
 
 gameplayState.prototype.updateScore = function(arrow, deer) {
     
-    // Removes the cow from the screen
+    // Removes the deer from the screen
     deer.destroy();
 
     //  Add and update the score
@@ -114,7 +126,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
 
     //  Subtract and update the score
     this.lives -= 1;
-    this.livesScoreText.text = 'Score: ' + this.lives;
+    this.livesScoreText.text = 'Lives: ' + this.lives;
 
 }
 
