@@ -24,7 +24,7 @@ gameplayState.prototype.preload = function()
 gameplayState.prototype.create = function()
 { 	
 	//arrow create stuff
-	this.arrow = game.add.sprite(32, game.world.height - 64, "arrow");
+	this.arrow = game.add.sprite(game.world.width/2 -32, game.world.height - 128, "arrow");
 	game.physics.enable(this.arrow, Phaser.Physics.ARCADE);
 	this.arrow.body.gravity.y = 0;
 	this.arrow.body.collideWorldBounds = true;
@@ -54,15 +54,15 @@ gameplayState.prototype.update = function()
 		if (game.input.mousePointer.isDown) {
 			if (!this.isSlowed){
 				let mouseX = game.input.mousePointer.x;
-				let dist = mouseX - this.arrow.body.x;
+				let dist = mouseX - this.arrow.body.x - this.arrow.body.width/2;
 				let speed = this.arrowSpeed * Math.abs(dist)/70 * Math.sign(dist);
 				this.arrow.body.x += speed;
 				console.log(speed);
 			}
 			else if (this.isSlowed){
 				let mouseX = game.input.mousePointer.x;
-				let dist = mouseX - this.arrow.body.x;
-				let speed = this.arrowSpeed/2 * Math.abs(dist)/70 * Math.sign(dist);
+				let dist = mouseX - this.arrow.body.x - this.arrow.body.width/2;
+				let speed = this.arrowSpeed/4 * Math.abs(dist)/70 * Math.sign(dist);
 				this.arrow.body.x += speed;
 				console.log(speed);
 			}
@@ -70,28 +70,28 @@ gameplayState.prototype.update = function()
 		
 		
 		//create a deer every 5 seconds
-		if (this.deerTimer >= 5000){
+		if (this.deerTimer >= Math.random() * 2000 + 6000){
 			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
 			deer.body.velocity.y = 300;
 			this.deerTimer = 0;
 		}
 		this.deerTimer = this.deerTimer + game.time.elapsed;
 		
-		if (this.rockTimer >= 5000){
+		if (this.rockTimer >= Math.random() * 2000 + 3000){
 			let rock = this.rocks.create(Math.random() * game.width/2 + game.width/4,100,'rock');
 			rock.body.velocity.y = 300;
 			this.rockTimer = 0;
 		}
 		this.rockTimer = this.rockTimer + game.time.elapsed;
 		
-		if (this.cowTimer >= 5000){
+		if (this.cowTimer >= Math.random() * 2000 + 5000){
 			let cow = this.cows.create(Math.random() * game.width/2 + game.width/4,100,'cow');
 			cow.body.velocity.y = 300;
 			this.cowTimer = 0;
 		}
 		this.cowTimer = this.cowTimer + game.time.elapsed;
 		
-		if (this.slowDownTimer >= 5000) {
+		if (this.slowDownTimer >= 3500) {
 			this.isSlowed = 0;
 			this.slowDownTimer = 0;
 		}
@@ -104,6 +104,24 @@ gameplayState.prototype.update = function()
 		game.physics.arcade.overlap(this.arrow, this.rocks, this.updateLife, null, this);
 		game.physics.arcade.overlap(this.arrow, this.cows, this.slowDown, null, this);
 		
+		//destroy when these things are off screen
+		this.deers.forEach(function(item){
+			if (item.body.y > game.world.height){
+				item.destroy();
+			}
+		},this);
+		
+		this.rocks.forEach(function(item){
+			if (item.body.y > game.world.height){
+				item.destroy();
+			}
+		},this);
+		
+		this.cows.forEach(function(item){
+			if (item.body.y > game.world.height){
+				item.destroy();
+			}
+		},this);
 	}
 };
 
