@@ -44,12 +44,16 @@ gameplayState.prototype.create = function()
 	//score
 	this.deerScoreText = game.add.text(600, 16, 'Score: 0', { fontSize: '24px', fill: '#ffffff' });
 	this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
+	
+	//pause button
+	pauseButton = game.add.button(0, game.world.height-64,
+		'pauseButton', pauseGame, this, 2, 1, 0);
 };
 
 gameplayState.prototype.update = function()
 { 
 	//while we have one or more lives
-	if (this.lives > 0){
+	if (this.lives > 0 && !game.pause){
 		//arrow movement
 		if (game.input.mousePointer.isDown) {
 			if (!this.isSlowed){
@@ -57,14 +61,12 @@ gameplayState.prototype.update = function()
 				let dist = mouseX - this.arrow.body.x - this.arrow.body.width/2;
 				let speed = this.arrowSpeed * Math.abs(dist)/70 * Math.sign(dist);
 				this.arrow.body.x += speed;
-				console.log(speed);
 			}
 			else if (this.isSlowed){
 				let mouseX = game.input.mousePointer.x;
 				let dist = mouseX - this.arrow.body.x - this.arrow.body.width/2;
 				let speed = this.arrowSpeed/4 * Math.abs(dist)/70 * Math.sign(dist);
 				this.arrow.body.x += speed;
-				console.log(speed);
 			}
 		}
 		
@@ -123,6 +125,33 @@ gameplayState.prototype.update = function()
 			}
 		},this);
 	}
+	
+	//when you lose
+	if (this.lives == 0){
+		this.deers.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		this.rocks.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		this.cows.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		button1 = game.add.button(game.world.width/2, game.world.height/2 + 100,
+		'button', restartLevel, this, 2, 1, 0);
+		button1.anchor.set(0.5,0.5);
+		this.startGameText = game.add.text(game.world.width/2, game.world.height/2 + 100,
+		'Restart Level', { fontSize: '32px', fill: '#000000' });
+		this.startGameText.anchor.set(0.5,0.5);
+	}
+	
+	if (game.pause){
+		unpauseButton = game.add.button(game.world.width/2+200, game.world.height/2,
+			'unpauseButton', unpauseGame, this, 2, 1, 0);
+	}
 };
 
 
@@ -159,4 +188,16 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 	
 }
 
+function restartLevel(){
+	this.lives = 3;
+	game.state.start("Game");
+}
+
+function pauseGame(){
+	game.pause = true;
+}
+
+function unpauseGame(){
+	game.pause = false;
+}
 
