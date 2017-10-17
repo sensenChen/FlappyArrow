@@ -14,6 +14,8 @@ let gameplayState = function()
 	this.isSlowed = false;
 	this.slowDownTimer = 0;
 	this.arrowSpeed = 7;
+	
+	this.pauseGame = true;
 };
 
 gameplayState.prototype.preload = function()
@@ -48,6 +50,10 @@ gameplayState.prototype.create = function()
 	//pause button
 	pauseButton = game.add.button(0, game.world.height-64,
 		'pauseButton', pauseGame, this, 2, 1, 0);
+		
+	this.unpauseButton = game.add.button(game.world.width/2+200, game.world.height/2,
+		'unpauseButton', unpauseGame, this, 2, 1, 0);
+	this.unpauseButton.kill();
 };
 
 gameplayState.prototype.update = function()
@@ -55,7 +61,7 @@ gameplayState.prototype.update = function()
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
-		if (game.input.mousePointer.isDown) {
+		if (game.input.mousePointer.isDown && (game.input.mousePointer.x > 64 || game.input.mousePointer.y < game.world.height-64)) {
 			if (!this.isSlowed){
 				let mouseX = game.input.mousePointer.x;
 				let dist = mouseX - this.arrow.body.x - this.arrow.body.width/2;
@@ -148,9 +154,32 @@ gameplayState.prototype.update = function()
 		this.startGameText.anchor.set(0.5,0.5);
 	}
 	
-	if (game.pause){
-		unpauseButton = game.add.button(game.world.width/2+200, game.world.height/2,
-			'unpauseButton', unpauseGame, this, 2, 1, 0);
+	if (game.pause && this.pauseGame){
+		this.unpauseButton.reset(game.world.width/2+200, game.world.height/2);
+		this.deers.forEach(function(item){
+			item.body.velocity.y = 0;
+		},this);
+		
+		this.rocks.forEach(function(item){
+			item.body.velocity.y = 0;
+		},this);
+		
+		this.cows.forEach(function(item){
+			item.body.velocity.y = 0;
+		},this);
+	}
+	else if(!game.pause){
+		this.deers.forEach(function(item){
+			item.body.velocity.y = 300;
+		},this);
+		
+		this.rocks.forEach(function(item){
+			item.body.velocity.y = 300;
+		},this);
+		
+		this.cows.forEach(function(item){
+			item.body.velocity.y = 300;
+		},this);
 	}
 };
 
@@ -190,14 +219,18 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 
 function restartLevel(){
 	this.lives = 3;
+	this.score = 0;
 	game.state.start("Game");
 }
 
 function pauseGame(){
 	game.pause = true;
+	this.pauseGame = true;
 }
 
 function unpauseGame(){
+	this.unpauseButton.kill();
 	game.pause = false;
+	this.pauseGame = false;
 }
 
