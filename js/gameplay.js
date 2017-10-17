@@ -21,101 +21,77 @@ gameplayState.prototype.preload = function()
 {
   // load assets needed for the preloader here 
 };
-//
-//gameplayState.prototype.generateMap = function() {
-//  let range = 50;
-//  let stride = 20;
-//  let distance = 255;
-//  
-//  for(var i=1;i<range/2;i++) {
-//    let wall = this.walls.create(i*stride+10, -1*i*100+100,'wall');
-//    wall.body.velocity.y = 600;
-//    wall.width = 600;
-//    wall.x -=600;
-//    
-//    let wall2 = this.walls.create(i*stride+distance+10, -1*i*100+100,'wall');
-//    wall2.body.velocity.y = 600;
-//    wall2.width = 600;
-//  }
-//  
-//  for(var i=range-1;i>=range/2;i--) {
-//    let wall = this.walls.create((range-1-i)*stride+10, -1*i*100+100,'wall');
-//    wall.body.velocity.y = 600;
-//    wall.width = 600;
-//    wall.x -=600;
-//    
-//    let wall2 = this.walls.create((range-1-i)*stride+distance+10, -1*i*100+100,'wall');
-//    wall2.body.velocity.y = 600;
-//    wall2.width = 600;
-//  }
-//}
 
 function sincurve(i,curve) {
-  return (curve*Math.sin(i*Math.PI/180.0)+curve)/(curve*.25);
+  return (curve*Math.sin(i*Math.PI/180.0));
 }
 
 function coscurve(i,curve) {
-  return (curve*Math.cos(i*Math.PI/180.0)+curve)/(curve*.25);
+  return (curve*Math.cos(i*Math.PI/180.0));
 }
 
 function line(i,curve) {
   return i/10.0;
 }
 
+gameplayState.prototype.addbackground = function(){
+  let bg = this.background.create(0,1000,'tm3');
+  bg.body.velocity.y = 600;
+  bg.width = game.world.width;
+  
+  let bg1 = this.background.create(0,500,'tm2');
+  bg1.body.velocity.y = 600;
+  bg1.width = game.world.width;
+  
+  let bg2 = this.background.create(0,0,'tm1');
+  bg2.body.velocity.y = 600;
+  bg2.width = game.world.width;
+  
+  let bg3 = this.background.create(0,-500,'tm3');
+  bg3.body.velocity.y = 600;
+  bg3.width = game.world.width;
+}
 
-gameplayState.prototype.generateMap2 = function(curveFun) {
+
+gameplayState.prototype.generateMap = function(curveFun)  {
   let range = 60;
   let slice = 360/range;
   let theta = Math.PI/2;
   let distance = 375;
-  let curve = 12;
+  let curve = 24;
+  let length = 1;
+  let stride = 10;
+  let offset = 200;
   
   
-//  let range = 20;
-//  let slice = 360/range;
-//  let theta = Math.PI/2;
-//  let distance = 225;
-//  let curve = 12;
-    
-//   for(var i=0;i<360;i+=slice) {
-//    var y = curveFun(i,curve);
-//    var x = i/slice;
-//    
-//    let lwall = this.leftwall.create(y*5+i/2,-1*x*100-100,'wall');
-//    lwall.body.velocity.y = 600;
-//    lwall.width = 1000;
-//    lwall.x -=1000;
-//    lwall.x -=1000;
-//    
-//    
-//    let rwall = this.rightwall.create(y*5+distance, -1*x*100-100,'wall');
-//    rwall.body.velocity.y = 600;
-//    rwall.width = 1000;
-//    rwall.x +=1000;
-//  }
-//  
-  for(var i=0;i<360;i+=slice) {
+  for(var i=0;i<360*length;i+=slice) {
     var y = curveFun(i,curve);
     var x = i/slice;
     
-    let lwall = this.leftwall.create(y*50,-1*x*100-100,'wall');
+    let lwall = this.leftwall.create(y*stride+offset,-1*x*100-100,'wall');
     lwall.body.velocity.y = 600;
     lwall.width = 600;
     lwall.x -=600;
     lwall.x -=1000;
     
-    
-    let rwall = this.rightwall.create(y*50+distance, -1*x*100-100,'wall');
+    let rwall = this.rightwall.create(y*stride+distance+offset, -1*x*100-100,'wall');
     rwall.body.velocity.y = 600;
     rwall.width = 600;
     rwall.x +=1000;
   }
 }
 
+
+
 gameplayState.prototype.create = function()
 { 	
     this.wallit = 0;
+    this.bgit = 0;
     
+    //background
+    this.background = game.add.group();
+    this.background.enableBody = true;
+    this.addbackground();
     
 	//arrow create stuff
 	this.arrow = game.add.sprite(game.world.width/2 -32, game.world.height - 128, "arrow");
@@ -141,8 +117,8 @@ gameplayState.prototype.create = function()
     
     this.rightwall = game.add.group();
     this.rightwall.enableBody = true;
-    this.generateMap2(sincurve);
-    
+    this.generateMap(sincurve);
+  
 	//score
 	this.deerScoreText = game.add.text(600, 16, 'Score: 0', { fontSize: '24px', fill: '#ffffff' });
 	this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
@@ -240,8 +216,14 @@ gameplayState.prototype.update = function()
 				item.destroy();
 			}
 		},this);
-
-      
+        
+//        console.log(this.background.children[this.bgit].body.y);
+        if(this.background.children[this.bgit].body.y>=1500) {
+          
+          this.background.children[this.bgit].y = -500;
+          this.bgit = (this.bgit + 1) % 4;
+        }
+        
         if(this.leftwall.children.length>0 && 
            this.leftwall.children[this.leftwall.children.length-1].body.y>game.world.height &&  
            this.wallit==this.leftwall.children.length) {
@@ -260,6 +242,8 @@ gameplayState.prototype.update = function()
           this.wallit = 0;
         }
 	}
+  
+    
 	
 	//when you lose
 	if (this.lives == 0){
@@ -299,15 +283,15 @@ gameplayState.prototype.update = function()
 	}
 	else if(!game.pause){
 		this.deers.forEach(function(item){
-			item.body.velocity.y = 300;
+			item.body.velocity.y = 600;
 		},this);
 		
 		this.rocks.forEach(function(item){
-			item.body.velocity.y = 300;
+			item.body.velocity.y = 600;
 		},this);
 		
 		this.cows.forEach(function(item){
-			item.body.velocity.y = 300;
+			item.body.velocity.y = 600;
 		},this);
 	}
 };
@@ -317,7 +301,7 @@ gameplayState.prototype.updateScore = function(arrow, deer) {
     
     // Removes the deer from the screen
     deer.destroy();
-
+  
     //  Add and update the score
     this.deerScore += 1;
     this.deerScoreText.text = 'Score: ' + this.deerScore;
