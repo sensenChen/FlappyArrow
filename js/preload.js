@@ -11,7 +11,7 @@ preloadState.prototype.preload = function()
 	game.load.image('deer', 'assets/deer.png');
 	game.load.image('rock', 'assets/rock.png');
 	game.load.image('cow', 'assets/cow.png');
-
+    game.load.image('wall', 'assets/wall.png');
 };
 
 preloadState.prototype.create = function()
