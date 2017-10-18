@@ -99,7 +99,6 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       offset = distance-this.it*50;
       if(offset<200) {
           offset = 200;
-          this.vel += 50;
       } 
       
     
@@ -243,11 +242,6 @@ gameplayState.prototype.create = function()
 };
 
 gameplayState.prototype.update = function() {
-    if(!game.pause && this.vel!=this.background.children[0].body.velocity.y) {
-      this.setVelocity(this.vel);
-    }  
-  
-  
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
@@ -383,7 +377,7 @@ gameplayState.prototype.update = function() {
 	} 
   
     //pause game
-    if (game.pause){
+    if(game.pause){
 	  pauseBoard.reset(game.world.width/2,game.world.height/2);
 	  pauseBoardText.reset(game.world.width/2,game.world.height/2-600)
       //resume button
