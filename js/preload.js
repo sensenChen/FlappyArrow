@@ -15,11 +15,12 @@ preloadState.prototype.preload = function()
 	game.load.image('pauseButton', 'assets/Pause_Button.png');
 	game.load.image('resumeButton','assets/Resume_Button.png');
 	game.load.image('mainMenuButton','assets/MainMenu_Button.png');
-	game.load.image('restartButton','/assets/Restart_Button.png');
+	game.load.image('restartButton','assets/Restart_Button.png');
     game.load.image('tm1','UI_elements/bg1.png');
     game.load.image('tm2','UI_elements/bg2.png');
     game.load.image('tm3','UI_elements/bg3.png');
-    game.load.image('tm4','UI_elements/bg4.png');	
+    game.load.image('tm4','UI_elements/bg4.png');
+	game.load.image('pauseBoard','assets/Pause&info_board.png');
 };  
 
 preloadState.prototype.create = function()

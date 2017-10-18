@@ -175,6 +175,11 @@ gameplayState.prototype.create = function()
 	this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
 	
 	//pause buttons
+	
+	pauseBoard = game.add.sprite(0,0,'pauseBoard');
+	pauseBoard.anchor.set(0.5,0.5);
+	pauseBoard.kill();
+	
 	pauseButton = game.add.button(0, game.world.height-64,
     'pauseButton', pauseGame, this, 2, 1, 0);
 	pauseButton.scale.setTo(.255,.24)
@@ -203,6 +208,7 @@ gameplayState.prototype.create = function()
 	mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
 	'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
 	mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+	mainMenuButtonFromDeath.scale.setTo(.75,.75);
 	mainMenuButtonFromDeath.kill();
 	
 	//sounds
@@ -366,6 +372,7 @@ gameplayState.prototype.update = function() {
   
     //pause game
     if (game.pause){
+	  pauseBoard.reset(game.world.width/2,game.world.height/2);
       //resume button
       resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
       //restart button
