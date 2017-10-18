@@ -24,6 +24,7 @@ gameplayState.prototype.preload = function()
   game.load.audio('loseLife','assets/Music&sound/Lose_life.wav');
   game.load.audio('loseGame','assets/Music&sound/Die.wav');
   game.load.audio('cowHit','assets/Music&sound/Hit_cow.wav');
+  game.load.audio('backgroundSong', 'assets/Music&sound/Music-2.wav');
 };
 
 function sincurve(i,curve) {
@@ -179,11 +180,23 @@ gameplayState.prototype.create = function()
 	mainMenuButton.anchor.set(0.5,0.5);
 	mainMenuButton.kill();
 	
+	button1 = game.add.button(game.world.width/2, game.world.height/2 - 100,
+	'restartButton', restartLevel, this, 2, 1, 0);
+	button1.anchor.set(0.5,0.5);
+	button1.kill()
+	
+	mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
+	'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
+	mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+	mainMenuButtonFromDeath.kill();
+	
 	//sounds
     this.cowHit = game.add.audio('cowHit');
 	this.deerHit = game.add.audio('deerHit');
 	this.loseLife = game.add.audio('loseLife');
 	this.loseGame = game.add.audio('loseGame');
+	this.backgroundSong = game.add.audio('backgroundSong');
+	this.backgroundSong.play()
 };
 
 gameplayState.prototype.update = function()
@@ -306,6 +319,7 @@ gameplayState.prototype.update = function()
         //main menu button
         mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
         this.setVelocity(0);
+<<<<<<< HEAD
       }
       else if(!game.pause){//unpause game
         this.setVelocity(600);
@@ -346,6 +360,36 @@ gameplayState.prototype.update = function()
 //      mainMenuButtonFromDeath.anchor.set(0.5,0.5);
     }
 
+		if(this.playDeathSound){
+			this.loseGame.play();
+		}
+		this.playDeathSound = false;
+		pauseButton.kill()
+		this.deers.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		this.rocks.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		this.cows.forEach(function(item){
+			item.destroy();
+		},this);
+		
+		this.rightwall.forEach(function(item) {
+			item.destroy();
+        }, this);
+		this.leftwall.forEach(function(item) {
+			item.destroy();
+        }, this);
+		this.arrow.destroy();
+		
+		
+		button1.reset(game.world.width/2, game.world.height/2 - 100);
+		mainMenuButtonFromDeath.reset(game.world.width/2, game.world.height/2 +100);
+	}
+>>>>>>> 650a4440e3e77eaa8479c90e813c334a8d358749
 };
 
 gameplayState.prototype.setVelocity = function(vel) {    
