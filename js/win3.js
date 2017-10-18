@@ -1,35 +1,31 @@
-//constructor. A function constructor, no less!
+/** @constructor */
 let win3 = function() {};
 
-//when Phaser creates an instance of this state, we want it to
 win3.prototype.preload = function() {
-    game.load.image('background', 'assets/TitleBack_new.png');
-    game.load.image('exitButton', 'assets/Exit_Button_new.png');
-    game.load.image('instructionsButton', 'assets/Instruction_Button_new.png');
-    game.load.image('startButton', 'assets/Start_Button_new.png');
-    game.load.image('endlessButton', 'assets/Endless_Button_new.png');
-    game.load.image('win3', 'assets/win3.png');
+    // load assets needed for the preloader here 
+    game.load.image('cutscene1', 'assets/cutscenes/Ending-Good-1.png');
+    game.load.image('cutscene2', 'assets/cutscenes/Ending-Good-2.png');
 };
 
-win3.prototype.create = function() {
-    this.background = game.add.sprite(0, 0, 'win1');
-    button1 = game.add.button(game.world.width/2-5, game.world.height/2 + 350, 'startButton', startGame, this, 2, 1, 0);
-    button1.anchor.set(0.5, 0.5);
+win3.prototype.create = function() { 
+    this.cutscene1 = game.add.sprite(0,0,'cutscene1');
+    this.cutscene1.visible = true;
+    this.cutscene2 = game.add.sprite(0,0,'cutscene2');
+    this.cutscene2.visible = false;
+    
+    this.timer = 0;
+    this.cooldown = 30;
 };
 
-win3.prototype.update = function() {};
-
-function startGame() {
-    game.gamemode = "game2";
-    game.state.start("Preload");
-}
-
-//
-//function instructions() {
-//    game.state.start("Instructions");
-//}
-//
-//function endlessMode() {
-//    game.gamemode = "endless";
-//    game.state.start("Preload");
-//}
+win3.prototype.update = function() {
+    if (game.input.activePointer.isDown && this.timer > this.cooldown) {
+    if (this.cutscene1.visible) {
+            this.cutscene1.visible = false;
+            this.cutscene2.visible = true;
+        }
+        else if (this.cutscene2.visible) {
+            this.cutscene2.visible = false;
+            game.state.start('Menu');
+        }
+    }
+};

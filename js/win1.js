@@ -13,13 +13,13 @@ win1.prototype.preload = function() {
 
 win1.prototype.create = function() {
     this.background = game.add.sprite(0, 0, 'win1');
-    button1 = game.add.button(game.world.width/2-5, game.world.height/2 + 350, 'startButton', startGame, this, 2, 1, 0);
+    button1 = game.add.button(game.world.width/2-5, game.world.height/2 + 350, 'startButton', this.startGame, this, 2, 1, 0);
     button1.anchor.set(0.5, 0.5);
 };
 
 win1.prototype.update = function() {};
 
-function startGame() {
+win1.prototype.startGame = function() {
     game.gamemode = "game2";
     game.state.start("Preload");
 }
