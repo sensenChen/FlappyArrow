@@ -157,7 +157,7 @@ gameplayState2.prototype.create = function() {
     //this.wallit = 0;
     this.bgit = 0;
     this.it = 0;  
-    this.vel = 700;
+    this.vel = 600;
     
     //background
     this.background = game.add.group();

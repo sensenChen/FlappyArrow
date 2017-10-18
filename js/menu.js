@@ -12,7 +12,7 @@ menuState.prototype.preload = function() {
 
 menuState.prototype.create = function() {
     this.background = game.add.sprite(0, 0, 'background');
-    this.title = game.add.text(game.world.width/2, game.world.centerY - 300, 'Flappy Arrow', { fontSize: '32px', fill: '#ffffff' });
+    this.title = game.add.text(game.world.width/2, game.world.centerY - 300, 'Royal Hunter', { fontSize: '32px', fill: '#ffffff' });
     this.title.anchor.set(0.5, 0);
         
     button1 = game.add.button(game.world.width/2-5, game.world.height/2 + 100, 'startButton', this.startGame, this, 2, 1, 0);
