@@ -125,34 +125,23 @@ gameplayState.prototype.create = function()
 	//pause buttons
 	pauseButton = game.add.button(0, game.world.height-64,
 		'pauseButton', pauseGame, this, 2, 1, 0);
+	pauseButton.scale.setTo(.255,.24)
 	
 	restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300,
-	'button', restartLevelFromPause, this, 2, 1, 0);
+	'restartButton', restartLevelFromPause, this, 2, 1, 0);
 	restartLevelButton.anchor.set(0.5,0.5);
 	restartLevelButton.kill();
-	this.restartText = game.add.text(game.world.width/2, game.world.height/2-300,
-	'Restart Level', { fontSize: '32px', fill: '#000000' });
-	this.restartText.anchor.set(0.5,0.5);
-	this.restartText.kill();
 	
 	
 	resumeButton = game.add.button(game.world.width/2, game.world.height/2-300,
-	'button', resumeGame, this, 2, 1, 0);
+	'resumeButton', resumeGame, this, 2, 1, 0);
 	resumeButton.anchor.set(0.5,0.5);
 	resumeButton.kill();
-	this.resumeText = game.add.text(game.world.width/2, game.world.height/2-300,
-	'Resume Game', { fontSize: '32px', fill: '#000000' });
-	this.resumeText.anchor.set(0.5,0.5);
-	this.resumeText.kill();
 	
 	mainMenuButton = game.add.button(game.world.width/2, game.world.height/2-300,
-	'button', goToMainMenu, this, 2, 1, 0);
+	'mainMenuButton', goToMainMenu, this, 2, 1, 0);
 	mainMenuButton.anchor.set(0.5,0.5);
 	mainMenuButton.kill();
-	this.mainMenuText = game.add.text(game.world.width/2, game.world.height/2-300,
-	'Main Menu', { fontSize: '32px', fill: '#000000' });
-	this.mainMenuText.anchor.set(0.5,0.5);
-	this.mainMenuText.kill();
 };
 
 gameplayState.prototype.update = function()
@@ -294,32 +283,25 @@ gameplayState.prototype.update = function()
 		this.arrow.destroy();
 		
 		button1 = game.add.button(game.world.width/2, game.world.height/2 - 100,
-		'button', restartLevel, this, 2, 1, 0);
+		'restartButton', restartLevel, this, 2, 1, 0);
 		button1.anchor.set(0.5,0.5);
-		this.startGameText = game.add.text(game.world.width/2, game.world.height/2 - 100,
-		'Restart Level', { fontSize: '32px', fill: '#000000' });
-		this.startGameText.anchor.set(0.5,0.5);
 		
 		mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
-		'button', goToMainMenuFromDeath, this, 2, 1, 0);
+		'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
 		mainMenuButtonFromDeath.anchor.set(0.5,0.5);
-		this.mainMenuTextFromDeath = game.add.text(game.world.width/2, game.world.height/2+100,
-		'Main Menu', { fontSize: '32px', fill: '#000000' });
-		this.mainMenuTextFromDeath.anchor.set(0.5,0.5);
 		
 		
 	}
 	//pause game
 	if (game.pause){
 		//resume button
-		resumeButton.reset(game.world.width/2, game.world.height/2-200);
-		this.resumeText.reset(game.world.width/2, game.world.height/2-200);
+		resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+		
 		//restart button
-		restartLevelButton.reset(game.world.width/2, game.world.height/2);
-		this.restartText.reset(game.world.width/2, game.world.height/2);
+		restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+
 		//main menu button
-		mainMenuButton.reset(game.world.width/2,game.world.height/2 + 200);
-		this.mainMenuText.reset(game.world.width/2,game.world.height/2 + 200)
+		mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);
 		
 		this.deers.forEach(function(item){
 			item.body.velocity.y = 0;
@@ -419,11 +401,8 @@ function pauseGame(){
 
 function resumeGame(){
 	resumeButton.kill();
-	this.resumeText.kill();
 	restartLevelButton.kill();
-	this.restartText.kill();
 	mainMenuButton.kill();
-	this.mainMenuText.kill();
 	this.deerTimer = 0;
 	this.cowTimer = 1200;
 	this.rockTimer = 2300;
@@ -433,11 +412,8 @@ function resumeGame(){
 
 function goToMainMenu(){
 	resumeButton.kill();
-	this.resumeText.kill();
 	restartLevelButton.kill();
-	this.restartText.kill();
 	mainMenuButton.kill();
-	this.mainMenuText.kill();
 	this.deerTimer = 0;
 	this.cowTimer = 1200;
 	this.rockTimer = 2300;

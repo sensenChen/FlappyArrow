@@ -12,11 +12,14 @@ preloadState.prototype.preload = function()
 	game.load.image('rock', 'assets/rock.png');
 	game.load.image('cow', 'assets/cow.png');
     game.load.image('wall', 'assets/wall.png');
-	game.load.image('pauseButton', 'assets/pauseButton.png');
-	game.load.image('unpauseButton','assets/unpause.png');
+	game.load.image('pauseButton', 'assets/Pause_Button.png');
+	game.load.image('resumeButton','assets/Resume_Button.png');
+	game.load.image('mainMenuButton','assets/MainMenu_Button.png');
+	game.load.image('restartButton','/assets/Restart_Button.png');
     game.load.image('tm1','assets/tm1.png');
     game.load.image('tm2','assets/tm2.png');
     game.load.image('tm3','assets/tm2.png');
+	
 };  
 
 preloadState.prototype.create = function()
