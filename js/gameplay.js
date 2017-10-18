@@ -12,16 +12,17 @@ let gameplayState = function() {
     
     //tree and checkpoint variables
     this.treeInterval = 500; //interval in between tree generation
-    this.numTreesPerInterval = 3; //number of trees at each generation
+    this.numTreesPerInterval = 0; //number of trees at each generation
     this.treespercheckpoint = 10; //number of tree generations to reach the next checkpoint
     this.checkpointsperlevel = 4; //number of checkpoints to complete the level
-    this.levellength = this.treespercheckpoint * this.checkpointsperlevel; //basically the total number of tree generations in the level
+    this.levellength = 100; //basically the total number of tree generations in the level
     
     //counters
     this.treeTimer = 0;
     this.treecounter = 0;
     this.checkpointcounter = 0;
     this.levelprogress = 0;
+    this.difficulty = 20;
     
     //variables for slowing down arrow
     this.isSlowed = false;
@@ -217,7 +218,7 @@ gameplayState.prototype.create = function() {
     pauseButton = game.add.button(0, game.world.height-64, 'pauseButton', pauseGame, this, 2, 1, 0);
     pauseButton.scale.setTo(.512, .481)
     
-    restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300, 'restartButton', restartLevelFromPause, this, 2, 1, 0);
+    restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300, 'restartButton', restartPause, this, 2, 1, 0);
     restartLevelButton.anchor.set(0.5, 0.5);
     restartLevelButton.kill();
     
@@ -229,13 +230,12 @@ gameplayState.prototype.create = function() {
     mainMenuButton.anchor.set(0.5, 0.5);
     mainMenuButton.kill();
     
-    button1 = game.add.button(game.world.width/2, game.world.height/2 - 100, 'restartButton', restartLevel, this, 2, 1, 0);
+    button1 = game.add.button(game.world.width/2, game.world.height/2 - 100, 'restartButton', restartThisLevel, this, 2, 1, 0);
     button1.anchor.set(0.5,0.5);
     button1.kill()
     
     mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100, 'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
     mainMenuButtonFromDeath.anchor.set(0.5,0.5);
-    mainMenuButtonFromDeath.scale.setTo(.75,.75);
     mainMenuButtonFromDeath.kill();
     
     //sounds
@@ -272,6 +272,7 @@ gameplayState.prototype.create = function() {
 gameplayState.prototype.update = function() {
     //while player has lives remaining
     if (this.lives > 0 && !game.pause) {
+        
         //arrow movement based on mouse down
         if (game.input.mousePointer.isDown && (game.input.mousePointer.x > 64 || game.input.mousePointer.y < game.world.height-64)) {
             //if slowdown is not active, move normally
@@ -332,6 +333,13 @@ gameplayState.prototype.update = function() {
             //increment level progress for each row of trees drawn
             this.treecounter += 1;
             this.levelprogress += 1;
+            this.difficulty +=1;
+            
+            console.log(this.difficulty);
+            if(this.difficulty%30==0 && this.numTreesPerInterval<4) {
+              this.numTreesPerInterval++;
+            }
+            
             this.updateprogressbar();
         }
         this.treeTimer = this.treeTimer + game.time.elapsed;
@@ -432,14 +440,12 @@ gameplayState.prototype.update = function() {
         */
         
         //when number of tree generations reach the threshold, activate a checkpoint
-        if (this.treecounter >= this.treespercheckpoint) {
+        if (this.levelprogress%Math.floor(this.levellength*(1/this.checkpointsperlevel))==0) {
             //update counters
             this.treecounter = 0;
             this.checkpointcounter += 1;
             this.checkpointreached();
         }
-        
-        //console.log(this.levelprogress);
     }
     
     //when level is finished, do something
@@ -471,6 +477,7 @@ gameplayState.prototype.update = function() {
     
     //if player has run out of lives
     if (this.lives == 0) {
+        this.arrow.animations.stop(null, true);
         //play a sound
         if (this.playDeathSound) {
             this.loseGame.play();
@@ -581,8 +588,20 @@ gameplayState.prototype.updateprogressbar = function() {
     //fill bar
     this.progressbar.lineStyle(2, this.progressbarcolor, 1);
     this.progressbar.beginFill(this.progressbarcolor, 0.8);
-    let progress = this.levelprogress * 1.0 / this.levellength;
-    let progresswidth = this.progressbarwidth * progress;
+    
+//    let progress=0;
+    if(this.levelprogress<this.levellength) {
+      progress = (this.levelprogress%this.levellength/ this.levellength)
+    } else {
+      progress = 1;
+    }
+
+    progress*=this.levellength;  
+//    progress=this.le
+    progresswidth = (7*progress)-.29*progress;
+    
+//    console.log(progresswidth);
+  
     this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
     
     //progress bar sprite replaces old box drawing
@@ -611,18 +630,23 @@ gameplayState.prototype.increaseLife = function(arrow, oneUp){
 }
 
 //called when restart button is clicked from game over menu, restarts the game state
-function restartLevel() {
+//function restartLevel() {
+//
+//}
+
+function restartThisLevel() {
     this.lives = 3;
     this.score = 0;
     this.deerTimer = 0;
     this.cowTimer = 1200;
     this.rockTimer = 2300;
     this.backgroundSong.stop();
+    this.levelprogress = 0;
     game.state.start("Game");
 }
 
-//called when restart button is clicked from pause menu, restarts the game state
-function restartLevelFromPause() {
+
+function restartPause() {
     this.lives = 3;
     this.score = 0;
     game.pause = false;
@@ -630,9 +654,23 @@ function restartLevelFromPause() {
     this.cowTimer = 1200;
     this.rockTimer = 2300;
     this.pauseGame = false;
+    this.levelprogress = 0;
     this.backgroundSong.stop();
     game.state.start("Game");
 }
+//
+////called when restart button is clicked from pause menu, restarts the game state
+//function restartLevelFromPause() {
+////    this.lives = 3;
+////    this.score = 0;
+////    game.pause = false;
+////    this.deerTimer = 0;
+////    this.cowTimer = 1200;
+////    this.rockTimer = 2300;
+////    this.pauseGame = false;
+////    this.backgroundSong.stop();
+////    game.state.start("Game");
+//}
 
 //called when the pause button is clicked, pauses the game
 function pauseGame() {
