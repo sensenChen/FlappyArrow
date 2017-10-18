@@ -571,8 +571,10 @@ function restartLevel() {
     this.deerTimer = 0;
     this.cowTimer = 1200;
     this.rockTimer = 2300;
+    this.treeInterval = 600;
+    this.numTreesPerInterval = 0;
     this.backgroundSong.stop();
-    game.state.start("Game");
+    game.state.start("Endless");
 }
 
 //called when restart button is clicked from pause menu, restarts the game state
@@ -584,8 +586,10 @@ function restartLevelFromPause() {
     this.cowTimer = 1200;
     this.rockTimer = 2300;
     this.pauseGame = false;
+    this.treeInterval = 600;
+    this.numTreesPerInterval = 0;
     this.backgroundSong.stop();
-    game.state.start("Game");
+    game.state.start("Endless");
 }
 
 //called when the pause button is clicked, pauses the game
