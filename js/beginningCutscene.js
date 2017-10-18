@@ -56,6 +56,7 @@ beginningState.prototype.update = function()
 	}
 	else if (this.cutscene6.visible && game.input.mousePointer.isDown){
 		this.cutscene6.visible = false;
+        game.gamemode = "story";
 		game.state.start('Preload');
 	}
 	

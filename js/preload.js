@@ -1,5 +1,7 @@
 //constructor. A function constructor, no less!
-let preloadState = function() {};
+let preloadState = function() {
+//  game.gamemode = "story";
+};
 
 //when Phaser creates an instance of this state, we want it to
 preloadState.prototype.preload = function() {
@@ -26,7 +28,7 @@ preloadState.prototype.preload = function() {
 preloadState.prototype.create = function() {
     console.log(game.gamemode);
   
-    if (game.gamemode == "menu") {
+    if (game.gamemode == "story") {
         game.state.start("Game");
     }
     

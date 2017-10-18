@@ -15,7 +15,7 @@ let gameplayState2 = function() {
     this.numTreesPerInterval = 0; //number of trees at each generation
     this.treespercheckpoint = 10; //number of tree generations to reach the next checkpoint
     this.checkpointsperlevel = 4; //number of checkpoints to complete the level
-    this.levellength = 1000; //basically the total number of tree generations in the level
+    this.levellength = 500; //basically the total number of tree generations in the level
     
     //counters
     this.treeTimer = 0;
@@ -156,7 +156,7 @@ gameplayState2.prototype.create = function() {
     //this.wallit = 0;
     this.bgit = 0;
     this.it = 0;  
-    this.vel = 700;
+    this.vel = 600;
     
     //background
     this.background = game.add.group();
@@ -634,13 +634,13 @@ gameplayState2.prototype.finishlevel = function() {
   //movestate to blah
   //increase game speed
   //check if you get .75% of total deers 80% 85%
-  if(this.totalDeer*.80>this.score) {
-     //lose
-    game.state.start("Lose");
-  } else {
+//  if(this.totalDeer*.80>this.score) {
+//     //lose
+//    game.state.start("Lose");
+//  } else {
     //win 
     game.state.start("Win2");
-  }
+//  }
 }
 
 //called when a oneup is hit, removes the oneup and increments lives with a cap of 3
