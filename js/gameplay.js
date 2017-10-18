@@ -353,6 +353,17 @@ gameplayState.prototype.update = function() {
         game.physics.arcade.overlap(this.arrow, this.cows, this.slowDown, null, this);
         game.physics.arcade.overlap(this.arrow, this.oneUps, this.increaseLife, null, this);
         game.physics.arcade.overlap(this.arrow, this.trees, this.updateLife, null, this);
+		
+		//check overlaps with other stuff
+		game.physics.arcade.overlap(this.deers,this.rocks,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.deers,this.cows,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.deers,this.oneUps,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.trees,this.deers,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.rocks,this.cows,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.rocks,this.oneUps,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.cows,this.OneUps,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.trees,this.cows,this.moveSprites, null, this);
+		game.physics.arcade.overlap(this.trees,this.oneUps,this.moveSprites, null, this);
          
         /*
         //idk how else to do this without breaking the walls... increment level progress for each wall drawn
@@ -458,6 +469,7 @@ gameplayState.prototype.update = function() {
         
         //restart button
         restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2+200);
+		console.log(restartLevelButton);
         
         //main menu button
         mainMenuButton.reset(game.world.width/2 - 5, game.world.height/2+400);
@@ -610,6 +622,10 @@ gameplayState.prototype.increaseLife = function(arrow, oneUp){
     this.livesScoreText.text = 'Lives: ' + this.lives;
 }
 
+gameplayState.prototype.moveSprites = function(object1,object2){
+	object2.body.x = object2.body.x + 64;
+}
+
 //called when restart button is clicked from game over menu, restarts the game state
 function restartLevel() {
     this.lives = 3;
@@ -629,7 +645,6 @@ function restartLevelFromPause() {
     this.deerTimer = 0;
     this.cowTimer = 1200;
     this.rockTimer = 2300;
-    this.pauseGame = false;
     this.backgroundSong.stop();
     game.state.start("Game");
 }
