@@ -9,6 +9,7 @@ let gameplayState = function()
 	this.deerTimer = 0;
 	this.rockTimer = 2300;
 	this.cowTimer = 1200;
+	this.oneUpTimer = 0;
 	
 	//variables for slowing down arrow
 	this.isSlowed = false;
@@ -25,6 +26,7 @@ gameplayState.prototype.preload = function()
   game.load.audio('loseGame','assets/Music&sound/Die.wav');
   game.load.audio('cowHit','assets/Music&sound/Hit_cow.wav');
   game.load.audio('backgroundSong', 'assets/Music&sound/Music-2.wav');
+  game.load.audio('gotOneUp','assets/Music&sound/Pickup_life.wav');
 };
 
 function sincurve(i,curve) {
@@ -168,6 +170,10 @@ gameplayState.prototype.create = function()
 	this.cows = game.add.group(this.obstacles);
 	this.cows.enableBody = true;
 	
+	//oneUp stuff
+	this.oneUps = game.add.group(this.obstacles);
+	this.oneUps.enableBody = true;
+	
     //walls
     this.leftwall = game.add.group(this.obstacles);
     this.leftwall.enableBody = true;
@@ -229,6 +235,7 @@ gameplayState.prototype.create = function()
 	this.deerHit.volume = 0.2;
 	this.cowHit.volume = 0.2;
 	this.loseGame = game.add.audio('loseGame');
+	this.gotOneUp = game.add.audio('gotOneUp');
 	this.backgroundSong = game.add.audio('backgroundSong');
     this.backgroundSong.loop = true;
 	this.backgroundSong.play()
@@ -247,6 +254,7 @@ gameplayState.prototype.create = function()
 	this.pb.width = this.progressbarwidth + 20;
 	this.pb.height = this.progressbarheight + 20;
 	
+	//just so the saved values aren't null
 	this.checkpointreached();
 };
 
@@ -272,7 +280,6 @@ gameplayState.prototype.update = function() {
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
 			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
-			//deer.scale.setTo(2,2);
 			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}
@@ -294,6 +301,13 @@ gameplayState.prototype.update = function() {
 		}
 		this.cowTimer = this.cowTimer + game.time.elapsed;
 		
+		if(this.oneUpTimer >= Math.random() * 5000 + 12000){
+			let oneUp = this.oneUps.create(Math.random() * game.width/2 + game.width/4,100,'oneUp');
+			oneUp.body.velocity.y = this.vel;
+			this.oneUpTimer= 0;
+		}
+		this.oneUpTimer = this.oneUpTimer + game.time.elapsed;
+		
 		if (this.slowDownTimer >= 3500) {
 			this.isSlowed = 0;
 			this.arrow.animations.stop(null,true);
@@ -307,12 +321,13 @@ gameplayState.prototype.update = function() {
 		game.physics.arcade.overlap(this.arrow, this.deers, this.updateScore, null, this);
 		game.physics.arcade.overlap(this.arrow, this.rocks, this.updateLife, null, this);
 		game.physics.arcade.overlap(this.arrow, this.cows, this.slowDown, null, this);
-	
-	//idk how else to do this without breaking the walls...
+		game.physics.arcade.overlap(this.arrow, this.oneUps, this.increaseLife, null, this);
+		 
+        //idk how else to do this without breaking the walls...
 	if (this.wallit < this.rightwall.children.length && this.rightwall.children[this.wallit].y > 500 && this.rightwall.children[this.wallit].y < game.world.height) {
             this.levelprogress += 1;
             this.updateprogressbar();
-        }	 
+        }
       
         if(this.wallit<this.leftwall.children.length && this.leftwall.children[this.wallit].y>500) {
           this.leftwall.children[this.wallit].x+=1000;
@@ -355,6 +370,12 @@ gameplayState.prototype.update = function() {
                   item.destroy();
               }
           }, this);
+		  
+		this.oneUps.forEach(function(item) {
+              if (item.body.y > game.world.height){
+                  item.destroy();
+              }
+          }, this);
           this.wallit = 0;
 //          this.generateMap(sincurve,0);
           this.it++;
@@ -377,6 +398,7 @@ gameplayState.prototype.update = function() {
   
     //pause game
     if(game.pause){
+	  //pauseBoard stuff
 	  pauseBoard.reset(game.world.width/2,game.world.height/2);
 	  pauseBoardText.reset(game.world.width/2,game.world.height/2-600)
       //resume button
@@ -416,6 +438,9 @@ gameplayState.prototype.update = function() {
       this.leftwall.forEach(function(item) {
           item.destroy();
       }, this);
+	  this.oneUps.forEach(function(item) {
+          item.destroy();
+      }, this);
       this.arrow.destroy();
       button1.reset(game.world.width/2, game.world.height/2 - 100);
       mainMenuButtonFromDeath.reset(game.world.width/2, game.world.height/2 +100);
@@ -452,7 +477,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
     this.loseLife.play();
-    //this doesn't work yet
+    
     this.restartfromlastcheckpoint();
 }
 
@@ -518,6 +543,16 @@ gameplayState.prototype.updateprogressbar = function() {
 
 gameplayState.prototype.finishlevel = function() {
     
+}
+
+gameplayState.prototype.increaseLife = function(arrow,oneUp){
+	oneUp.destroy();
+	
+	if(this.lives < 3){
+		this.gotOneUp.play();
+		this.lives = this.lives + 1;
+	}
+	this.livesScoreText.text = 'Lives: ' + this.lives;
 }
 
 function restartLevel(){
