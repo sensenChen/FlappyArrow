@@ -29,8 +29,9 @@ function coscurve(i,curve) {
   return (curve*Math.cos(i*Math.PI/180.0));
 }
 
-function line(i,curve) {
-  return i/10.0;
+function line(i,length, val) {
+  let m = (val*100.0)/(0.5*length);
+  return i*m;
 }
 
 gameplayState.prototype.addbackground = function(){
@@ -52,7 +53,7 @@ gameplayState.prototype.addbackground = function(){
 }
 
 
-gameplayState.prototype.generateMap = function(curveFun)  {
+gameplayState.prototype.generateMap = function(curveFun,type)  {
   let range = 60;
   let slice = 360/range;
   let theta = Math.PI/2;
@@ -61,22 +62,56 @@ gameplayState.prototype.generateMap = function(curveFun)  {
   let length = 1;
   let stride = 10;
   let offset = 200;
+  let coef = Math.sign(Math.random()*2-1);
   
+  console.log(coef);
+  let numtimes = 10;
   
-  for(var i=0;i<360*length;i+=slice) {
-    var y = curveFun(i,curve);
-    var x = i/slice;
+  if(type==0) {
+    for(var i=0;i<360*length;i+=slice) {
+      var y = curveFun(i,curve);
+      var x = i/slice;
+
+      let lwall = this.leftwall.create(y*stride+offset,-1*x*100-100,'wall');
+      lwall.body.velocity.y = 600;
+      lwall.width = 600;
+      lwall.x -=600;
+      lwall.x -=1000;
+
+      let rwall = this.rightwall.create(y*stride+distance+offset, -1*x*100-100,'wall');
+      rwall.body.velocity.y = 600;
+      rwall.width = 600;
+      rwall.x +=1000;
+    }
+  } else {
+      let val = Math.random();
+      let curr = 0;  
+      for(var j=0;j<numtimes;j++) {
+        coef = Math.sign(Math.random()*2-1);
+        for(var i=0;i<10;i++) {
+          var y = coef* curveFun(i,range/2,val)+50;
+          console.log(i,y);
+          var x = curr;
+
+          let lwall = this.leftwall.create(y*5,-1*x*100-100,'wall');
+          lwall.body.velocity.y = 600;
+          lwall.width = 600;
+          lwall.x -=600;
+          lwall.x -=1000;
+
+          let rwall = this.rightwall.create(y*5+distance, -1*x*100-100,'wall');
+          rwall.body.velocity.y = 600;
+          rwall.width = 600;
+          rwall.x +=1000;
+          curr++;
+        } 
+        
+        curr+=1;
+        
+      }
     
-    let lwall = this.leftwall.create(y*stride+offset,-1*x*100-100,'wall');
-    lwall.body.velocity.y = 600;
-    lwall.width = 600;
-    lwall.x -=600;
-    lwall.x -=1000;
     
-    let rwall = this.rightwall.create(y*stride+distance+offset, -1*x*100-100,'wall');
-    rwall.body.velocity.y = 600;
-    rwall.width = 600;
-    rwall.x +=1000;
+    
   }
 }
 
@@ -116,7 +151,7 @@ gameplayState.prototype.create = function()
     
     this.rightwall = game.add.group();
     this.rightwall.enableBody = true;
-    this.generateMap(sincurve);
+    this.generateMap(line, 1);
   
 	//score
 	this.deerScoreText = game.add.text(600, 16, 'Score: 0', { fontSize: '24px', fill: '#ffffff' });
@@ -157,8 +192,6 @@ gameplayState.prototype.create = function()
 
 gameplayState.prototype.update = function()
 { 
-	game.physics.arcade.collide(this.arrow, this.leftwall);
-	game.physics.arcade.collide(this.arrow, this.rightwall);
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
@@ -215,14 +248,13 @@ gameplayState.prototype.update = function()
       
         if(this.wallit<this.leftwall.children.length && this.leftwall.children[this.wallit].y>500) {
           this.leftwall.children[this.wallit].x+=1000;
-//          this.wallit++;
         }
       
         if(this.wallit<this.rightwall.children.length && this.rightwall.children[this.wallit].y>500) {
           this.rightwall.children[this.wallit].x-=1000;
           this.wallit++;
         }
-      
+        
 		//destroy when these things are off screen
 		this.deers.forEach(function(item){
 			if (item.body.y > game.world.height){
@@ -241,10 +273,8 @@ gameplayState.prototype.update = function()
 				item.destroy();
 			}
 		},this);
-        
-//        console.log(this.background.children[this.bgit].body.y);
+
         if(this.background.children[this.bgit].body.y>=1500) {
-          
           this.background.children[this.bgit].y = -500;
           this.bgit = (this.bgit + 1) % 4;
         }
@@ -265,6 +295,7 @@ gameplayState.prototype.update = function()
               }
           }, this);
           this.wallit = 0;
+          this.generateMap(sincurve,0);
         }
 	}
   
@@ -338,6 +369,9 @@ gameplayState.prototype.update = function()
 		this.leftwall.forEach(function(item){
 			item.body.velocity.y = 0;
 		},this);
+        this.background.forEach(function(item){
+			item.body.velocity.y = 0;
+		},this);
 	}
 	else if(!game.pause){//unpause game
 		this.deers.forEach(function(item){
@@ -357,6 +391,10 @@ gameplayState.prototype.update = function()
 		},this);
       
 		this.rightwall.forEach(function(item){
+			item.body.velocity.y = 600;
+		},this);
+      
+        this.background.forEach(function(item){
 			item.body.velocity.y = 600;
 		},this);
 	}
