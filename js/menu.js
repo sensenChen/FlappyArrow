@@ -7,14 +7,16 @@ let menuState = function()
 //when Phaser creates an instance of this state, we want it to
 menuState.prototype.preload = function()
 {
-    game.load.image('exitButton','/assets/Exit_Button.png');
-	game.load.image('instructionsButton','assets/Instruction_Button.png');
-	game.load.image('startButton','assets/Start_Button.png');
+	game.load.image('background','assets/Title_background.png');
+    game.load.image('exitButton','assets/Exit_Button_new.png');
+	game.load.image('instructionsButton','assets/Instruction_Button_new.png');
+	game.load.image('startButton','assets/Start_Button_new.png');
 
 };
 
 menuState.prototype.create = function()
 {
+	this.background = game.add.sprite(0,0,'background');
 	this.title = game.add.text(game.world.width/2, game.world.centerY - 300,
 		'Title', { fontSize: '32px', fill: '#ffffff' });
 	this.title.anchor.set(0.5,0);

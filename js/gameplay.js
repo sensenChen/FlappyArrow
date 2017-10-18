@@ -182,9 +182,20 @@ gameplayState.prototype.create = function()
 	this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
 	
 	//pause buttons
+	
+	pauseBoard = game.add.sprite(0,0,'pauseBoard');
+	pauseBoard.anchor.set(0.5,0.5);
+	pauseBoard.kill();
+	
+	pauseBoardText = game.add.sprite(0,0,'pauseBoardText');
+	pauseBoardText.anchor.set(0.5,0.5);
+	pauseBoadText.scale.setTo(0.75,0.75);
+	pauseBoardText.kill();
+	
 	pauseButton = game.add.button(0, game.world.height-64,
     'pauseButton', pauseGame, this, 2, 1, 0);
 	pauseButton.scale.setTo(.255,.24)
+	pauseButton.anchor.set(0.5,0.5);
 	
 	restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300,
 	'restartButton', restartLevelFromPause, this, 2, 1, 0);
@@ -210,6 +221,7 @@ gameplayState.prototype.create = function()
 	mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
 	'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
 	mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+	mainMenuButtonFromDeath.scale.setTo(.75,.75);
 	mainMenuButtonFromDeath.kill();
 	
 	//sounds
@@ -373,12 +385,14 @@ gameplayState.prototype.update = function() {
   
     //pause game
     if (game.pause){
+	  pauseBoard.reset(game.world.width/2,game.world.height/2);
+	  pauseBoardText.reset(game.world.width/2,game.world.height/2-400);
       //resume button
-      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-100);
       //restart button
-      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2+100);
       //main menu button
-      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
+      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 300);	
       this.setVelocity(0);
     }
     else if(!game.pause){//unpause game
@@ -499,6 +513,8 @@ function pauseGame(){
 }
 
 function resumeGame(){
+	pauseBoard.kill();
+	pauseBoardText.kill();
 	resumeButton.kill();
 	restartLevelButton.kill();
 	mainMenuButton.kill();
