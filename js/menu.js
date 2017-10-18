@@ -27,7 +27,7 @@ menuState.prototype.update = function() {};
 
 function startGame() {
     game.gamemode = "story";
-    game.state.start("Preload");
+    game.state.start("Beginning");
 }
 
 function instructions() {
