@@ -1,13 +1,16 @@
 <!doctype html> 
 <html lang="en"> 
 <head> 
-	<meta charset="UTF-8" />
+    <meta charset="UTF-8" />
     <title>My awesome game</title>
-	<script type="text/javascript" src="js/phaser.min.js"></script>
-	<script type="text/javascript" src="js/preload.js"></script>
-	<script type="text/javascript" src="js/gameplay.js"></script>
-	<script type="text/javascript" src="js/menu.js"></script>
-	<script type="text/javascript" src="js/instructions.js"></script>
+
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="js/preload.js"></script>
+    <script type="text/javascript" src="js/gameplay.js"></script>
+    <script type="text/javascript" src="js/menu.js"></script>
+    <script type="text/javascript" src="js/instructions.js"></script>
+    <script type="text/javascript" src="js/endless.js"></script>
+
     <style type="text/css">
         body {
             margin: 0;
@@ -17,16 +20,14 @@
 <body>
 
 <script type="text/javascript">
-
-//taking out the additional arguments from "Hello world"
-	
-let game = new Phaser.Game(750, 1334, Phaser.AUTO);
-game.state.add("Preload", preloadState);
-game.state.add("Game", gameplayState);
-game.state.add("Menu", menuState)
-game.state.add("Instructions", instructionsState);
-game.state.start("Menu");
-
+    //taking out the additional arguments from "Hello world"
+    let game = new Phaser.Game(750, 1334, Phaser.AUTO);
+    game.state.add("Preload", preloadState);
+    game.state.add("Game", gameplayState);
+    game.state.add("Menu", menuState)
+    game.state.add("Instructions", instructionsState);
+    game.state.add("Endless", endlessState);
+    game.state.start("Menu");
 </script>
 
 </body>

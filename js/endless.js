@@ -1,5 +1,5 @@
 /** @constructor */
-let gameplayState = function() {
+let endlessState = function() {
     //ui variables
     this.deerScore = 0;
     this.lives = 3;
@@ -10,18 +10,14 @@ let gameplayState = function() {
     this.cowTimer = 1200;
     this.oneUpTimer = 0;
     
-    //tree and checkpoint variables
-    this.treeInterval = 500; //interval in between tree generation
-    this.numTreesPerInterval = 3; //number of trees at each generation
-    this.treespercheckpoint = 10; //number of tree generations to reach the next checkpoint
-    this.checkpointsperlevel = 4; //number of checkpoints to complete the level
-    this.levellength = this.treespercheckpoint * this.checkpointsperlevel; //basically the total number of tree generations in the level
-    
-    //counters
+    //initial tree and checkpoint variables
     this.treeTimer = 0;
+    this.treeInterval = 600;
+    this.numTreesPerInterval = 0;
+    this.treespercheckpoint = 10;
+    this.checkpointsperlevel = 4;
     this.treecounter = 0;
     this.checkpointcounter = 0;
-    this.levelprogress = 0;
     
     //variables for slowing down arrow
     this.isSlowed = false;
@@ -30,7 +26,7 @@ let gameplayState = function() {
     this.playDeathSound = true;
 };
 
-gameplayState.prototype.preload = function() {
+endlessState.prototype.preload = function() {
     //load assets needed for the preloader here 
     game.load.audio('deerHit', 'assets/Music&sound/Hit_deer.wav');
     game.load.audio('loseLife', 'assets/Music&sound/Lose_life.wav');
@@ -54,7 +50,7 @@ function line(i,length, val) {
 }
 
 //adds background...?
-gameplayState.prototype.addbackground = function() {
+endlessState.prototype.addbackground = function() {
     let bg = this.background.create(0, 1000, 'tm4');
     bg.body.velocity.y = this.vel;
     //bg.width = game.world.width;
@@ -76,7 +72,7 @@ gameplayState.prototype.addbackground = function() {
 }
 
 //generates a set of walls
-gameplayState.prototype.generateMap = function(curveFun, type) {
+endlessState.prototype.generateMap = function(curveFun, type) {
     let range = 60;
     let slice = 360/range;
     let theta = Math.PI/2;
@@ -140,7 +136,7 @@ gameplayState.prototype.generateMap = function(curveFun, type) {
     }
 }
 
-gameplayState.prototype.create = function() {
+endlessState.prototype.create = function() {
     //level progress
     /*
     this.mapspercheckpoint = 1;
@@ -201,11 +197,12 @@ gameplayState.prototype.create = function() {
     this.generateMap(line, 1);
     */
     
-    //score text
+    //score
     this.deerScoreText = game.add.text(600, 16, 'Score: 0', { fontSize: '24px', fill: '#ffffff' });
     this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
+    this.difficultyText = game.add.text(600, 80, 'Difficulty: 1', { fontSize: '24px', fill: '#ffffff' });
     
-    //pause menu buttons
+    //pause buttons
     pauseBoard = game.add.sprite(0, 0, 'pauseBoard');
     pauseBoard.anchor.set(0.5, 0.5);
     pauseBoard.kill();
@@ -251,25 +248,11 @@ gameplayState.prototype.create = function() {
     this.backgroundSong.loop = true;
     this.backgroundSong.play()
     
-    //progress bar initial draw
-    this.progressbarleftpadding = 64;
-    this.progressbarrightpadding = 16;
-    this.progressbarbottompadding = 16;
-    this.progressbarheight = 40;
-    this.progressbarwidth = game.world.width - this.progressbarleftpadding - this.progressbarrightpadding;
-    this.progressbarcolor = 0xD2A654;
-    this.progressbar = game.add.graphics(0, 0);
-    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-    //this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
-    this.pb = game.add.sprite(this.progressbarleftpadding - 10, game.world.height - this.progressbarheight - this.progressbarbottompadding - 10, 'pb');
-    this.pb.width = this.progressbarwidth + 20;
-    this.pb.height = this.progressbarheight + 20;
-    
     //just so the saved values aren't null
     this.checkpointreached();
 };
 
-gameplayState.prototype.update = function() {
+endlessState.prototype.update = function() {
     //while player has lives remaining
     if (this.lives > 0 && !game.pause) {
         //arrow movement based on mouse down
@@ -331,8 +314,6 @@ gameplayState.prototype.update = function() {
             
             //increment level progress for each row of trees drawn
             this.treecounter += 1;
-            this.levelprogress += 1;
-            this.updateprogressbar();
         }
         this.treeTimer = this.treeTimer + game.time.elapsed;
         
@@ -431,20 +412,18 @@ gameplayState.prototype.update = function() {
         }
         */
         
-        //when number of tree generations reach the threshold, activate a checkpoint
+        //checkpoint reached
         if (this.treecounter >= this.treespercheckpoint) {
             //update counters
             this.treecounter = 0;
             this.checkpointcounter += 1;
             this.checkpointreached();
         }
-        
-        //console.log(this.levelprogress);
     }
     
-    //when level is finished, do something
-    if (this.levelprogress >= this.levellength) {
-        this.finishlevel();
+    if (this.checkpointcounter >= this.checkpointsperlevel) {
+        this.checkpointcounter = 0;
+        this.increaseDifficulty();
     }
     
     //pause game
@@ -494,7 +473,7 @@ gameplayState.prototype.update = function() {
 };
 
 //sets the velocity of everything except arrow
-gameplayState.prototype.setVelocity = function(vel) {
+endlessState.prototype.setVelocity = function(vel) {
     this.obstacles.forEach(function(group) {
         group.forEach(function(item) {
             item.body.velocity.y = vel;
@@ -507,7 +486,7 @@ gameplayState.prototype.setVelocity = function(vel) {
 }
 
 //called when a deer is hit, removes deer and increments score
-gameplayState.prototype.updateScore = function(arrow, deer) {
+endlessState.prototype.updateScore = function(arrow, deer) {
     deer.destroy();
     this.deerHit.play();
     
@@ -516,7 +495,7 @@ gameplayState.prototype.updateScore = function(arrow, deer) {
 }
 
 //called when a rock or tree is hit, decrements lives and restarts from last checkpoint
-gameplayState.prototype.updateLife = function(arrow, rock) {
+endlessState.prototype.updateLife = function(arrow, rock) {
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
     this.loseLife.play();
@@ -525,7 +504,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
 }
 
 //called when a cow is hit, removes the cow, turns on slowdown, and flashes arrow
-gameplayState.prototype.slowDown = function(arrow, cow){
+endlessState.prototype.slowDown = function(arrow, cow){
     cow.destroy();
     this.cowHit.play();
     
@@ -535,7 +514,7 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 }
 
 //restart from the lastcheckpoint by removing all obstacles, regenerating the map, and resetting certain values to last saved values
-gameplayState.prototype.restartfromlastcheckpoint = function() {
+endlessState.prototype.restartfromlastcheckpoint = function() {
     //remove all the obstacles from the screen
     this.obstacles.forEach(function(group) {
         group.callAll('kill');
@@ -555,52 +534,19 @@ gameplayState.prototype.restartfromlastcheckpoint = function() {
     
     this.treecounter = 0;
     
-    //revert progress and score to last saved values
-    this.levelprogress = this.lastprogress;
-    this.updateprogressbar();
+    //revert score to last saved values
     this.deerScore = this.lastscore;
     this.deerScoreText.text = 'Score: ' + this.deerScore;
 }
 
 //called when a checkpoint is reached, updates saved values
-gameplayState.prototype.checkpointreached = function() {
-    this.lastprogress = this.levelprogress;
+endlessState.prototype.checkpointreached = function() {
     this.lastscore = this.deerScore;
     console.log("checkpoint");
 }
 
-//called every time the level progress is updated, redraws the progress bar
-gameplayState.prototype.updateprogressbar = function() {
-    this.progressbar.destroy();
-    this.progressbar = game.add.graphics(0,0);
-    
-    //old box drawing
-    //this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-    //this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
-    
-    //fill bar
-    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-    this.progressbar.beginFill(this.progressbarcolor, 0.8);
-    let progress = this.levelprogress * 1.0 / this.levellength;
-    let progresswidth = this.progressbarwidth * progress;
-    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
-    
-    //progress bar sprite replaces old box drawing
-    this.pb.destroy();
-    this.pb = game.add.sprite(this.progressbarleftpadding - 10, game.world.height - this.progressbarheight - this.progressbarbottompadding - 10, 'pb');
-    this.pb.width = this.progressbarwidth + 20;
-    this.pb.height = this.progressbarheight + 20;
-    
-    //console.log("Level progress: " + (progress * 100) + "%");
-}
-
-//called when the level is finished
-gameplayState.prototype.finishlevel = function() {
-    
-}
-
 //called when a oneup is hit, removes the oneup and increments lives with a cap of 3
-gameplayState.prototype.increaseLife = function(arrow, oneUp){
+endlessState.prototype.increaseLife = function(arrow, oneUp){
     oneUp.destroy();
     
     if (this.lives < 3){
@@ -608,6 +554,14 @@ gameplayState.prototype.increaseLife = function(arrow, oneUp){
         this.lives = this.lives + 1;
     }
     this.livesScoreText.text = 'Lives: ' + this.lives;
+}
+
+//increase difficulty!
+endlessState.prototype.increaseDifficulty = function() {
+    this.treeInterval -= 20;
+    this.numTreesPerInterval += 1;
+    
+    this.difficultyText.text = 'Difficulty: ' + (this.numTreesPerInterval);
 }
 
 //called when restart button is clicked from game over menu, restarts the game state
