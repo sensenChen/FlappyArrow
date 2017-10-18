@@ -19,10 +19,7 @@ preloadState.prototype.preload = function()
     game.load.image('tm1','UI_elements/bg1.png');
     game.load.image('tm2','UI_elements/bg2.png');
     game.load.image('tm3','UI_elements/bg3.png');
-    game.load.image('tm4','UI_elements/bg4.png');
-	
-	
-	
+    game.load.image('tm4','UI_elements/bg4.png');	
 };  
 
 preloadState.prototype.create = function()
