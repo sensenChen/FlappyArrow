@@ -41,21 +41,24 @@ function line(i,length, val) {
 }
 
 gameplayState.prototype.addbackground = function(){
-  let bg = this.background.create(0,1000,'tm1');
+  let bg = this.background.create(0,1000,'tm4');
   bg.body.velocity.y = this.vel;
 //  bg.width = game.world.width;
   
-  let bg1 = this.background.create(0,500,'tm2');
+  let bg1 = this.background.create(0,500,'tm1');
   bg1.body.velocity.y = this.vel;
 //  bg1.width = game.world.width;
   
-  let bg2 = this.background.create(0,0,'tm3');
+  let bg2 = this.background.create(0,0,'tm2');
   bg2.body.velocity.y = this.vel;
 //  bg2.width = game.world.width;
   
-  let bg3 = this.background.create(0,-500,'tm4');
+  let bg3 = this.background.create(0,-500,'tm3');
   bg3.body.velocity.y = this.vel;
 //  bg3.width = game.world.width;
+  
+//  let bg4 = this.background.create(0,-1000,'tm4');
+//  bg4.body.velocity.y = this.vel; 
 }
 
 gameplayState.prototype.generateMap = function(curveFun,type)  {
@@ -92,12 +95,18 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       let val = Math.random();
       let curr = 0; 
       
+    
+      offset = distance-this.it*50;
+      if(offset<200) {
+          offset = 200;
+      } 
+      
+    
       for(var j=0;j<numtimes;j++) {
         val = Math.random();
         coef = Math.sign(Math.random()*2-1);
         for(var i=0;i<5;i++) {
           var y = coef* curveFun(i,range/2,val)+50;
-//          console.log(i,y);
           var x = curr;
 
           let lwall = this.leftwall.create(y*5,-1*x*100-100,'wall');
@@ -105,9 +114,6 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
           lwall.width = 1000;
           lwall.x -=1000;
           lwall.x -=1000;
-          
-          offset = distance-this.it*50;
-          if(offset<200) offset = 200;
           
           let rwall = this.rightwall.create(y*5+offset, -1*x*100-100,'wall');
           rwall.body.velocity.y = this.vel;
@@ -175,9 +181,18 @@ gameplayState.prototype.create = function()
 	this.livesScoreText = game.add.text(600, 48, 'Lives: 3', { fontSize: '24px', fill: '#ffffff' });
 	
 	//pause buttons
+	
+	pauseBoard = game.add.sprite(0,0,'pauseBoard');
+	pauseBoard.anchor.set(0.5,0.5);
+	pauseBoard.kill();
+	
+	pauseBoardText = game.add.sprite(0,0,'pauseBoardText');
+	pauseBoardText.anchor.set(0.5,0,5);
+	pauseBoardText.kill();
+	
 	pauseButton = game.add.button(0, game.world.height-64,
     'pauseButton', pauseGame, this, 2, 1, 0);
-	pauseButton.scale.setTo(.255,.24)
+	pauseButton.scale.setTo(.512,.481)
 	
 	restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300,
 	'restartButton', restartLevelFromPause, this, 2, 1, 0);
@@ -203,6 +218,7 @@ gameplayState.prototype.create = function()
 	mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
 	'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
 	mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+	mainMenuButtonFromDeath.scale.setTo(.75,.75);
 	mainMenuButtonFromDeath.kill();
 	
 	//sounds
@@ -253,9 +269,8 @@ gameplayState.prototype.update = function() {
 		
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
-			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer',0);
-			let anim = deer.animations.add('walk');
-			deer.animations.play('walk',5,true);
+			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
+			deer.scale.setTo(0.048,0.0853);
 			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}
@@ -348,20 +363,22 @@ gameplayState.prototype.update = function() {
 	    this.mapcounter = 0;
 	    this.checkpointcounter += 1;
 	}
+      }
       
       if (this.levelprogress >= this.levellength) {
           this.finishlevel();
       }
-	} 
   
     //pause game
-    if (game.pause){
+    if(game.pause){
+	  pauseBoard.reset(game.world.width/2,game.world.height/2);
+	  pauseBoardText.reset(game.world.width/2,game.world.height/2-600)
       //resume button
-      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+      resumeButton.reset(game.world.width/2 - 5, game.world.height/2);
       //restart button
-      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2+200);
       //main menu button
-      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
+      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2+400);	
       this.setVelocity(0);
     }
     else if(!game.pause){//unpause game
@@ -411,6 +428,7 @@ gameplayState.prototype.setVelocity = function(vel) {
       item.body.velocity.y = vel;
   },this);
 }
+
 
 gameplayState.prototype.updateScore = function(arrow, deer) {    
     // Removes the deer from the screen
@@ -477,6 +495,10 @@ gameplayState.prototype.finishlevel = function() {
 function restartLevel(){
 	this.lives = 3;
 	this.score = 0;
+    this.deerTimer = 0;
+	this.cowTimer = 1200;
+	this.rockTimer = 2300;
+    this.backgroundSong.stop();
 	game.state.start("Game");
 }
 
@@ -497,6 +519,8 @@ function pauseGame(){
 }
 
 function resumeGame(){
+	pauseBoard.kill();
+	pauseBoardText.kill();
 	resumeButton.kill();
 	restartLevelButton.kill();
 	mainMenuButton.kill();
