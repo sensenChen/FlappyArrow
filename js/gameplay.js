@@ -34,26 +34,26 @@ function coscurve(i,curve) {
 }
 
 function line(i,length, val) {
-  let m = (val*100.0)/(0.5*length);
+  let m = (val*150.0)/(0.5*length);
   return i*m;
 }
 
 gameplayState.prototype.addbackground = function(){
-  let bg = this.background.create(0,1000,'tm3');
+  let bg = this.background.create(0,1000,'tm1');
   bg.body.velocity.y = 600;
-  bg.width = game.world.width;
+//  bg.width = game.world.width;
   
   let bg1 = this.background.create(0,500,'tm2');
   bg1.body.velocity.y = 600;
-  bg1.width = game.world.width;
+//  bg1.width = game.world.width;
   
-  let bg2 = this.background.create(0,0,'tm1');
+  let bg2 = this.background.create(0,0,'tm3');
   bg2.body.velocity.y = 600;
-  bg2.width = game.world.width;
+//  bg2.width = game.world.width;
   
-  let bg3 = this.background.create(0,-500,'tm3');
+  let bg3 = this.background.create(0,-500,'tm4');
   bg3.body.velocity.y = 600;
-  bg3.width = game.world.width;
+//  bg3.width = game.world.width;
 }
 
 
@@ -91,6 +91,7 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       let val = Math.random();
       let curr = 0;  
       for(var j=0;j<numtimes;j++) {
+        val = Math.random();
         coef = Math.sign(Math.random()*2-1);
         for(var i=0;i<10;i++) {
           var y = coef* curveFun(i,range/2,val)+50;
@@ -109,17 +110,10 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
           rwall.x +=1000;
           curr++;
         } 
-        
         curr+=1;
-        
       }
-    
-    
-    
   }
 }
-
-
 
 gameplayState.prototype.create = function()
 { 	
@@ -163,7 +157,7 @@ gameplayState.prototype.create = function()
 	
 	//pause buttons
 	pauseButton = game.add.button(0, game.world.height-64,
-		'pauseButton', pauseGame, this, 2, 1, 0);
+    'pauseButton', pauseGame, this, 2, 1, 0);
 	pauseButton.scale.setTo(.255,.24)
 	
 	restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300,
@@ -296,11 +290,26 @@ gameplayState.prototype.update = function()
           this.generateMap(sincurve,0);
         }
 	}
-  
-    
 	
-	//when you lose
+	
+	//pause game
+	if (game.pause){
+      //resume button
+      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+      //restart button
+      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+      //main menu button
+      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
+      this.setVelocity(0);
+	}
+	else if(!game.pause){//unpause game
+      this.setVelocity(600);
+	}
+  
+    //when you lose
 	if (this.lives == 0){
+        
+        this.setVelocity(0);
 		if(this.playDeathSound){
 			this.loseGame.play();
 		}
@@ -333,102 +342,59 @@ gameplayState.prototype.update = function()
 		mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
 		'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
 		mainMenuButtonFromDeath.anchor.set(0.5,0.5);
-		
-		
-	}
-	//pause game
-	if (game.pause){
-		//resume button
-		resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
-		
-		//restart button
-		restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
-
-		//main menu button
-		mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);
-		
-		this.deers.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-		
-		this.rocks.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-		
-		this.cows.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-		this.rightwall.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-		this.leftwall.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-        this.background.forEach(function(item){
-			item.body.velocity.y = 0;
-		},this);
-	}
-	else if(!game.pause){//unpause game
-		this.deers.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
-		
-		this.rocks.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
-		
-		this.cows.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
-      
-		this.leftwall.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
-      
-		this.rightwall.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
-      
-        this.background.forEach(function(item){
-			item.body.velocity.y = 600;
-		},this);
 	}
 };
 
+gameplayState.prototype.setVelocity = function(vel) {    
+  this.deers.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
 
-gameplayState.prototype.updateScore = function(arrow, deer) {
-    
+  this.rocks.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
+
+  this.cows.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
+
+  this.leftwall.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
+
+  this.rightwall.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
+
+  this.background.forEach(function(item){
+      item.body.velocity.y = vel;
+  },this);
+}
+
+gameplayState.prototype.updateScore = function(arrow, deer) {    
     // Removes the deer from the screen
     deer.destroy();
-  
     //  Add and update the score
     this.deerScore += 1;
     this.deerScoreText.text = 'Score: ' + this.deerScore;
 	this.deerHit.play();
-
 }
 
 gameplayState.prototype.updateLife = function(arrow, rock) {
-    
     // Removes the rock from the screen
     rock.destroy();
-
     //  Subtract and update the score
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
 	this.loseLife.play();
-
 }
 
 gameplayState.prototype.slowDown = function(arrow, cow){
-	
 	// Removes the cow from the screen
 	cow.destroy();
-		
 	//Indicate that you are slowed
 	this.isSlowed = true;
 	this.slowDownTimer = 0;
-	
 }
 
 function restartLevel(){
@@ -460,7 +426,6 @@ function resumeGame(){
 	this.cowTimer = 1200;
 	this.rockTimer = 2300;
 	game.pause = false;
-	
 }
 
 function goToMainMenu(){
