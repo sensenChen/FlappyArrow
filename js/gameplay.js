@@ -127,6 +127,8 @@ gameplayState.prototype.create = function()
 	this.checkpointsperlevel = 4;
 	this.mapcounter = 0;
 	this.checkpointcounter = 0;
+	this.levellength = 50 * this.mapspercheckpoint * this.checkpointsperlevel;
+	this.levelprogress = 0;
   
     this.wallit = 0;
     this.bgit = 0;
@@ -138,6 +140,8 @@ gameplayState.prototype.create = function()
     this.background.enableBody = true;
     this.addbackground();
     
+    this.obstacles = game.add.group();
+    
 	//arrow create stuff
 	this.arrow = game.add.sprite(game.world.width/2 -32, game.world.height - 128, "arrow");
 	game.physics.enable(this.arrow, Phaser.Physics.ARCADE);
@@ -147,22 +151,22 @@ gameplayState.prototype.create = function()
 	this.arrow.animations.add('flash');
 	
 	//deer stuff
-	this.deers = game.add.group();
+	this.deers = game.add.group(this.obstacles);
 	this.deers.enableBody = true;
 	
 	//rock stuff
-	this.rocks = game.add.group();
+	this.rocks = game.add.group(this.obstacles);
 	this.rocks.enableBody = true;
 	
 	//cow stuff
-	this.cows = game.add.group();
+	this.cows = game.add.group(this.obstacles);
 	this.cows.enableBody = true;
 	
     //walls
-    this.leftwall = game.add.group();
+    this.leftwall = game.add.group(this.obstacles);
     this.leftwall.enableBody = true;
     
-    this.rightwall = game.add.group();
+    this.rightwall = game.add.group(this.obstacles);
     this.rightwall.enableBody = true;
     this.generateMap(line, 1);
   
@@ -281,7 +285,12 @@ gameplayState.prototype.update = function() {
 		game.physics.arcade.overlap(this.arrow, this.deers, this.updateScore, null, this);
 		game.physics.arcade.overlap(this.arrow, this.rocks, this.updateLife, null, this);
 		game.physics.arcade.overlap(this.arrow, this.cows, this.slowDown, null, this);
-		 
+	
+	//idk how else to do this without breaking the walls...
+	if (this.wallit < this.rightwall.children.length && this.rightwall.children[this.wallit].y > 500 && this.rightwall.children[this.wallit].y < game.world.height) {
+            this.levelprogress += 1;
+            this.updateprogressbar();
+        }	 
       
         if(this.wallit<this.leftwall.children.length && this.leftwall.children[this.wallit].y>500) {
           this.leftwall.children[this.wallit].x+=1000;
@@ -292,24 +301,17 @@ gameplayState.prototype.update = function() {
           this.wallit++;
         }
         
-		//destroy when these things are off screen
-		this.deers.forEach(function(item){
-			if (item.body.y > game.world.height){
-				item.destroy();
-			}
-		},this);
-		
-		this.rocks.forEach(function(item){
-			if (item.body.y > game.world.height){
-				item.destroy();
-			}
-		},this);
-		
-		this.cows.forEach(function(item){
-			if (item.body.y > game.world.height){
-				item.destroy();
-			}
-		},this);
+        //destroy obstacles when they run off the screen... except walls i guess. I don't get these walls at all
+        this.obstacles.forEach(function(group) {
+            if (group == this.leftwall || group == this.rightwall) {}
+            else {
+                group.forEach(function(item) {
+                    if (item.body.y > game.world.height) {
+                        item.destroy();
+                    }
+                }, this);
+            }
+        }, this);
 
         if(this.background.children[this.bgit].body.y>=1500) {
           this.background.children[this.bgit].y = -500;
@@ -342,22 +344,11 @@ gameplayState.prototype.update = function() {
 	    //update counters
 	    this.mapcounter = 0;
 	    this.checkpointcounter += 1;
-	    
-	    //redraw progress bar
-	    this.progressbar.destroy();
-	    this.progressbar = game.add.graphics(0,0);
-	    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
-	    this.progressbar.lineStyle(2, 0x000000, 0);
-    	    this.progressbar.beginFill(this.progressbarcolor, 0.5);
-    	    let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
-    	    let progresswidth = this.progressbarwidth * progress;
-    	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
-    	    
-    	    console.log("Level progress: " + (progress * 100) + "%");
 	}
-
       
+      if (this.levelprogress >= this.levellength) {
+          this.finishlevel();
+      }
 	} 
   
     //pause game
@@ -406,26 +397,12 @@ gameplayState.prototype.update = function() {
   
 };
 
-gameplayState.prototype.setVelocity = function(vel) {    
-  this.deers.forEach(function(item){
-      item.body.velocity.y = vel;
-  },this);
-
-  this.rocks.forEach(function(item){
-      item.body.velocity.y = vel;
-  },this);
-
-  this.cows.forEach(function(item){
-      item.body.velocity.y = vel;
-  },this);
-
-  this.leftwall.forEach(function(item){
-      item.body.velocity.y = vel;
-  },this);
-
-  this.rightwall.forEach(function(item){
-      item.body.velocity.y = vel;
-  },this);
+gameplayState.prototype.setVelocity = function(vel) {
+    this.obstacles.forEach(function(group) {
+        group.forEach(function(item) {
+            item.body.velocity.y = vel;
+        }, this);
+    }, this);
 
   this.background.forEach(function(item){
       item.body.velocity.y = vel;
@@ -447,7 +424,9 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
     //  Subtract and update the score
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
-	this.loseLife.play();
+    this.loseLife.play();
+    //this doesn't work yet
+    //this.restartfromlastcheckpoint();
 }
 
 gameplayState.prototype.slowDown = function(arrow, cow){
@@ -458,6 +437,33 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 	this.arrow.animations.play('flash',6,true);
 	this.slowDownTimer = 0;
     this.cowHit.play();
+}
+
+gameplayState.prototype.restartfromlastcheckpoint = function() {
+    this.obstacles.forEach(function(group) {
+        group.forEach(function(item) {
+            item.destroy();
+        }, this);
+    }, this);
+}
+
+gameplayState.prototype.updateprogressbar = function() {
+    //redraw progress bar
+    this.progressbar.destroy();
+    this.progressbar = game.add.graphics(0,0);
+    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
+    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
+    this.progressbar.lineStyle(2, 0x000000, 0);
+    this.progressbar.beginFill(this.progressbarcolor, 0.5);
+    let progress = this.levelprogress * 1.0 / this.levellength;
+    let progresswidth = this.progressbarwidth * progress;
+    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
+
+    //console.log("Level progress: " + (progress * 100) + "%");
+}
+
+gameplayState.prototype.finishlevel = function() {
+    
 }
 
 function restartLevel(){
