@@ -15,6 +15,12 @@ let gameplayState = function()
 	this.slowDownTimer = 0;
 	this.arrowSpeed = 7;
 	this.playDeathSound = true;
+	
+	//level progress
+	this.mapspercheckpoint = 1;
+	this.checkpointsperlevel = 4;
+	this.mapcounter = 0;
+	this.checkpointcounter = 0;
 };
 
 gameplayState.prototype.preload = function()
@@ -186,10 +192,15 @@ gameplayState.prototype.create = function()
 	this.deerHit = game.add.audio('deerHit');
 	this.loseLife = game.add.audio('loseLife');
 	this.loseGame = game.add.audio('loseGame');
+	
+	//progress bar initial draw
+	this.progressbarheight = game.world.height - 200;
+	this.progressbar = game.add.graphics(0, 0);
+	this.progressbar.lineStyle(2, 0x0000FF, 1);
+	this.progressbar.drawRect(0, 0, 50, this.progressbarheight);
 };
 
-gameplayState.prototype.update = function()
-{ 
+gameplayState.prototype.update = function() {
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
@@ -294,10 +305,29 @@ gameplayState.prototype.update = function()
           }, this);
           this.wallit = 0;
           this.generateMap(sincurve,0);
+          this.mapcounter += 1;
         }
 	}
   
-    
+	if (this.mapcounter >= this.mapspercheckpoint) {
+	    //update counters
+	    this.mapcounter = 0;
+	    this.checkpointcounter += 1;
+	    
+	    //redraw progress bar
+	    this.progressbar.destroy();
+	    this.progressbar = game.add.graphics(0,0);
+	    this.progressbar.lineStyle(2, 0x0000FF, 1);
+	    this.progressbar.drawRect(0, 0, 50, this.progressbarheight);
+	    this.progressbar.lineStyle(2, 0x000000, 0);
+    	    this.progressbar.beginFill(0x0000FF, 0.5);
+    	    let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
+    	    let progressheight = this.progressbarheight * progress;
+    	    let startpoint = this.progressbarheight - progressheight;
+    	    this.progressbar.drawRect(0, startpoint, 50, progressheight);
+    	    
+    	    console.log("Level progress: " + (progress * 100) + "%");
+	}
 	
 	//when you lose
 	if (this.lives == 0){
