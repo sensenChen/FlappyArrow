@@ -14,11 +14,15 @@ let gameplayState = function()
 	this.isSlowed = false;
 	this.slowDownTimer = 0;
 	this.arrowSpeed = 7;
+	this.playDeathSound = true;
 };
 
 gameplayState.prototype.preload = function()
 {
   // load assets needed for the preloader here 
+  game.load.audio('deerHit','assets/Music&sound/Hit_deer.wav');
+  game.load.audio('loseLife','assets/Music&sound/Lose_life.wav');
+  game.load.audio('loseGame','assets/Music&sound/Die.wav');
 };
 
 function sincurve(i,curve) {
@@ -142,6 +146,11 @@ gameplayState.prototype.create = function()
 	'mainMenuButton', goToMainMenu, this, 2, 1, 0);
 	mainMenuButton.anchor.set(0.5,0.5);
 	mainMenuButton.kill();
+	
+	//sounds
+	this.deerHit = game.add.audio('deerHit');
+	this.loseLife = game.add.audio('loseLife');
+	this.loseGame = game.add.audio('loseGame');
 };
 
 gameplayState.prototype.update = function()
@@ -261,6 +270,10 @@ gameplayState.prototype.update = function()
 	
 	//when you lose
 	if (this.lives == 0){
+		if(this.playDeathSound){
+			this.loseGame.play();
+		}
+		this.playDeathSound = false;
 		pauseButton.kill()
 		this.deers.forEach(function(item){
 			item.destroy();
@@ -353,6 +366,7 @@ gameplayState.prototype.updateScore = function(arrow, deer) {
     //  Add and update the score
     this.deerScore += 1;
     this.deerScoreText.text = 'Score: ' + this.deerScore;
+	this.deerHit.play();
 
 }
 
@@ -364,6 +378,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
     //  Subtract and update the score
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
+	this.loseLife.play();
 
 }
 
@@ -430,7 +445,6 @@ function goToMainMenuFromDeath(){
 	this.cowTimer = 1200;
 	this.rockTimer = 2300;
 	mainMenuButtonFromDeath.kill();
-	this.mainMenuTextFromDeath.kill();
 	game.state.start("Menu");
 }
 

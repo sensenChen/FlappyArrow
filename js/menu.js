@@ -19,10 +19,10 @@ menuState.prototype.create = function()
 		'Title', { fontSize: '32px', fill: '#ffffff' });
 	this.title.anchor.set(0.5,0);
 		
-	button1 = game.add.button(game.world.width/2, game.world.height/2 + 100,
+	button1 = game.add.button(game.world.width/2-5, game.world.height/2 + 100,
 		'startButton', startGame, this, 2, 1, 0);
 	button1.anchor.set(0.5,0.5);
-	button2 = game.add.button(game.world.width/2, game.world.height/2 + 350,
+	button2 = game.add.button(game.world.width/2-5, game.world.height/2 + 350,
 		'instructionsButton', instructions, this, 2, 1, 0);
 	button2.anchor.set(0.5,0.5);
 };
