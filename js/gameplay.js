@@ -246,6 +246,8 @@ gameplayState.prototype.create = function()
 	this.pb = game.add.sprite(this.progressbarleftpadding - 10, game.world.height - this.progressbarheight - this.progressbarbottompadding - 10, 'pb');
 	this.pb.width = this.progressbarwidth + 20;
 	this.pb.height = this.progressbarheight + 20;
+	
+	this.checkpointreached();
 };
 
 gameplayState.prototype.update = function() {
@@ -270,7 +272,7 @@ gameplayState.prototype.update = function() {
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
 			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
-			deer.scale.setTo(0.048,0.0853);
+			//deer.scale.setTo(2,2);
 			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}
@@ -278,6 +280,7 @@ gameplayState.prototype.update = function() {
 		
 		if (this.rockTimer >= Math.random() * 2000 + 3000){
 			let rock = this.rocks.create(Math.random() * game.width/2 + game.width/4,100,'rock');
+			rock.scale.setTo(2,2);
 			rock.body.velocity.y = this.vel;
 			this.rockTimer = 0;
 		}
@@ -285,6 +288,7 @@ gameplayState.prototype.update = function() {
 		
 		if (this.cowTimer >= Math.random() * 2000 + 5000){
 			let cow = this.cows.create(Math.random() * game.width/2 + game.width/4,100,'cow');
+			cow.scale.setTo(2,2);
 			cow.body.velocity.y = this.vel;
 			this.cowTimer = 0;
 		}
@@ -357,11 +361,13 @@ gameplayState.prototype.update = function() {
           this.generateMap(line,1,5);
           this.mapcounter += 1;
         }
-  
+        
+        //checkpoint reached
 	if (this.mapcounter >= this.mapspercheckpoint) {
 	    //update counters
 	    this.mapcounter = 0;
 	    this.checkpointcounter += 1;
+	    this.checkpointreached();
 	}
       }
       
@@ -447,7 +453,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
     this.livesScoreText.text = 'Lives: ' + this.lives;
     this.loseLife.play();
     //this doesn't work yet
-    //this.restartfromlastcheckpoint();
+    this.restartfromlastcheckpoint();
 }
 
 gameplayState.prototype.slowDown = function(arrow, cow){
@@ -461,11 +467,33 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 }
 
 gameplayState.prototype.restartfromlastcheckpoint = function() {
+    //remove all the obstacles from the screen
     this.obstacles.forEach(function(group) {
         group.forEach(function(item) {
             item.destroy();
         }, this);
     }, this);
+    
+    //because walls are buggy
+    this.leftwall.destroy();
+    this.rightwall.destroy();
+    this.leftwall = game.add.group(this.obstacles);
+    this.leftwall.enableBody = true;
+    this.rightwall = game.add.group(this.obstacles);
+    this.rightwall.enableBody = true;
+    this.generateMap(line, 1);
+    this.wallit = 0;
+    
+    //revert progress and score to last saved values
+    this.levelprogress = this.lastprogress;
+    this.updateprogressbar();
+    this.deerScore = this.lastscore;
+    this.deerScoreText.text = 'Score: ' + this.deerScore;
+}
+
+gameplayState.prototype.checkpointreached = function() {
+    this.lastprogress = this.levelprogress;
+    this.lastscore = this.deerScore;
 }
 
 gameplayState.prototype.updateprogressbar = function() {
