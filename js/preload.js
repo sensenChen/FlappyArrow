@@ -24,9 +24,20 @@ preloadState.prototype.preload = function() {
 };  
 
 preloadState.prototype.create = function() {
-    if (game.gamemode == "story") {
+    console.log(game.gamemode);
+  
+    if (game.gamemode == "menu") {
         game.state.start("Game");
     }
+    
+    if(game.gamemode == "game2") {
+      game.state.start("Game2");
+    }
+    
+    if(game.gamemode == "game3") {
+      game.state.start("Game3");
+    }
+  
     if (game.gamemode == "endless") {
         game.state.start("Endless");
     }

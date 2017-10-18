@@ -1,5 +1,5 @@
 /** @constructor */
-let gameplayState = function() {
+let gameplayState3 = function() {
     //ui variables
     this.deerScore = 0;
     this.lives = 500;
@@ -32,7 +32,7 @@ let gameplayState = function() {
     this.playDeathSound = true;
 };
 
-gameplayState.prototype.preload = function() {
+gameplayState3.prototype.preload = function() {
     //load assets needed for the preloader here 
     game.load.audio('deerHit', 'assets/Music&sound/Hit_deer.wav');
     game.load.audio('loseLife', 'assets/Music&sound/Lose_life.wav');
@@ -56,7 +56,7 @@ function line(i,length, val) {
 }
 
 //adds background...?
-gameplayState.prototype.addbackground = function() {
+gameplayState3.prototype.addbackground = function() {
     let bg = this.background.create(0, 1000, 'tm4');
     bg.body.velocity.y = this.vel;
     //bg.width = game.world.width;
@@ -78,7 +78,7 @@ gameplayState.prototype.addbackground = function() {
 }
 
 //generates a set of walls
-gameplayState.prototype.generateMap = function(curveFun, type) {
+gameplayState3.prototype.generateMap = function(curveFun, type) {
     let range = 60;
     let slice = 360/range;
     let theta = Math.PI/2;
@@ -142,7 +142,7 @@ gameplayState.prototype.generateMap = function(curveFun, type) {
     }
 }
 
-gameplayState.prototype.create = function() {
+gameplayState3.prototype.create = function() {
     //level progress
     /*
     this.mapspercheckpoint = 1;
@@ -156,7 +156,7 @@ gameplayState.prototype.create = function() {
     //this.wallit = 0;
     this.bgit = 0;
     this.it = 0;  
-    this.vel = 600;
+    this.vel = 800;
     
     //background
     this.background = game.add.group();
@@ -270,7 +270,7 @@ gameplayState.prototype.create = function() {
     this.checkpointreached();
 };
 
-gameplayState.prototype.update = function() {
+gameplayState3.prototype.update = function() {
     //while player has lives remaining
     if (this.lives > 0 && !game.pause) {
         
@@ -517,7 +517,7 @@ gameplayState.prototype.update = function() {
 };
 
 //sets the velocity of everything except arrow
-gameplayState.prototype.setVelocity = function(vel) {
+gameplayState3.prototype.setVelocity = function(vel) {
     this.obstacles.forEach(function(group) {
         group.forEach(function(item) {
             item.body.velocity.y = vel;
@@ -530,7 +530,7 @@ gameplayState.prototype.setVelocity = function(vel) {
 }
 
 //called when a deer is hit, removes deer and increments score
-gameplayState.prototype.updateScore = function(arrow, deer) {
+gameplayState3.prototype.updateScore = function(arrow, deer) {
     deer.destroy();
     this.deerHit.play();
     
@@ -539,7 +539,7 @@ gameplayState.prototype.updateScore = function(arrow, deer) {
 }
 
 //called when a rock or tree is hit, decrements lives and restarts from last checkpoint
-gameplayState.prototype.updateLife = function(arrow, rock) {
+gameplayState3.prototype.updateLife = function(arrow, rock) {
     this.lives -= 1;
     this.livesScoreText.text = 'Lives: ' + this.lives;
     this.loseLife.play();
@@ -548,7 +548,7 @@ gameplayState.prototype.updateLife = function(arrow, rock) {
 }
 
 //called when a cow is hit, removes the cow, turns on slowdown, and flashes arrow
-gameplayState.prototype.slowDown = function(arrow, cow){
+gameplayState3.prototype.slowDown = function(arrow, cow){
     cow.destroy();
     this.cowHit.play();
     
@@ -558,7 +558,7 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 }
 
 //restart from the lastcheckpoint by removing all obstacles, regenerating the map, and resetting certain values to last saved values
-gameplayState.prototype.restartfromlastcheckpoint = function() {
+gameplayState3.prototype.restartfromlastcheckpoint = function() {
     //remove all the obstacles from the screen
     this.obstacles.forEach(function(group) {
         group.callAll('kill');
@@ -586,14 +586,14 @@ gameplayState.prototype.restartfromlastcheckpoint = function() {
 }
 
 //called when a checkpoint is reached, updates saved values
-gameplayState.prototype.checkpointreached = function() {
+gameplayState3.prototype.checkpointreached = function() {
     this.lastprogress = this.levelprogress;
     this.lastscore = this.deerScore;
     console.log("checkpoint");
 }
 
 //called every time the level progress is updated, redraws the progress bar
-gameplayState.prototype.updateprogressbar = function() {
+gameplayState3.prototype.updateprogressbar = function() {
     this.progressbar.destroy();
     this.progressbar = game.add.graphics(0,0);
     
@@ -630,21 +630,21 @@ gameplayState.prototype.updateprogressbar = function() {
 }
 
 //called when the level is finished
-gameplayState.prototype.finishlevel = function() {
+gameplayState3.prototype.finishlevel = function() {
   //movestate to blah
   //increase game speed
   //check if you get .75% of total deers 80% 85%
-  if(this.totalDeer*.75>this.score) {
+  if(this.totalDeer*.85>this.score) {
     //lose
     game.state.start("Lose");
   } else {
     //win 
-    game.state.start("Win1");
+    game.state.start("Win3");
   }
 }
 
 //called when a oneup is hit, removes the oneup and increments lives with a cap of 3
-gameplayState.prototype.increaseLife = function(arrow, oneUp){
+gameplayState3.prototype.increaseLife = function(arrow, oneUp){
     oneUp.destroy();
     
     if (this.lives < 3){
@@ -654,7 +654,7 @@ gameplayState.prototype.increaseLife = function(arrow, oneUp){
     this.livesScoreText.text = 'Lives: ' + this.lives;
 }
 
-gameplayState.prototype.moveSprites = function(object1,object2){
+gameplayState3.prototype.moveSprites = function(object1,object2){
 	object2.body.x = object2.body.x + 64;
 }
 
