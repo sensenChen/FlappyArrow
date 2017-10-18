@@ -223,10 +223,13 @@ gameplayState.prototype.create = function()
 	this.progressbarbottompadding = 16;
 	this.progressbarheight = 40;
 	this.progressbarwidth = game.world.width - this.progressbarleftpadding - this.progressbarrightpadding;
-	this.progressbarcolor = 0x208456;
+	this.progressbarcolor = 0xD2A654;
 	this.progressbar = game.add.graphics(0, 0);
 	this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-	this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
+	//this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
+	this.pb = game.add.sprite(this.progressbarleftpadding - 10, game.world.height - this.progressbarheight - this.progressbarbottompadding - 10, 'pb');
+	this.pb.width = this.progressbarwidth + 20;
+	this.pb.height = this.progressbarheight + 20;
 };
 
 gameplayState.prototype.update = function() {
@@ -452,13 +455,18 @@ gameplayState.prototype.updateprogressbar = function() {
     this.progressbar.destroy();
     this.progressbar = game.add.graphics(0,0);
     this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
-    this.progressbar.lineStyle(2, 0x000000, 0);
-    this.progressbar.beginFill(this.progressbarcolor, 0.5);
+    //this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
+    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
+    this.progressbar.beginFill(this.progressbarcolor, 0.8);
     let progress = this.levelprogress * 1.0 / this.levellength;
     let progresswidth = this.progressbarwidth * progress;
     this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
-
+    
+    this.pb.destroy();
+    this.pb = game.add.sprite(this.progressbarleftpadding - 10, game.world.height - this.progressbarheight - this.progressbarbottompadding - 10, 'pb');
+    this.pb.width = this.progressbarwidth + 20;
+    this.pb.height = this.progressbarheight + 20;
+    
     //console.log("Level progress: " + (progress * 100) + "%");
 }
 
