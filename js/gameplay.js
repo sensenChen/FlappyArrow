@@ -99,14 +99,10 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       offset = distance-this.it*50;
       if(offset<200) {
           offset = 200;
-          this.vel += 20;
-          this.setVelocity(this.vel);
-          
-          this.background.forEach(function(item){
-              item.body.velocity.y = vel;
-          },this);
+          this.vel += 50;
       } 
-
+      
+    
       for(var j=0;j<numtimes;j++) {
         val = Math.random();
         coef = Math.sign(Math.random()*2-1);
@@ -243,6 +239,11 @@ gameplayState.prototype.create = function()
 };
 
 gameplayState.prototype.update = function() {
+    if(!game.pause && this.vel!=this.background.children[0].body.velocity.y) {
+      this.setVelocity(this.vel);
+    }  
+  
+  
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
@@ -328,7 +329,7 @@ gameplayState.prototype.update = function() {
 			}
 		},this);
 
-        if(this.background.children[this.bgit].body.y>=1499) {
+        if(this.background.children[this.bgit].body.y>=1500) {
           this.background.children[this.bgit].y = -500;
           this.bgit = (this.bgit + 1) % 4;
         }
