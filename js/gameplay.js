@@ -183,9 +183,13 @@ gameplayState.prototype.create = function()
 	pauseBoard.anchor.set(0.5,0.5);
 	pauseBoard.kill();
 	
+	pauseBoardText = game.add.sprite(0,0,'pauseBoardText');
+	pauseBoardText.anchor.set(0.5,0,5);
+	pauseBoardText.kill();
+	
 	pauseButton = game.add.button(0, game.world.height-64,
     'pauseButton', pauseGame, this, 2, 1, 0);
-	pauseButton.scale.setTo(.255,.24)
+	pauseButton.scale.setTo(.512,.481)
 	
 	restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300,
 	'restartButton', restartLevelFromPause, this, 2, 1, 0);
@@ -381,12 +385,13 @@ gameplayState.prototype.update = function() {
     //pause game
     if (game.pause){
 	  pauseBoard.reset(game.world.width/2,game.world.height/2);
+	  pauseBoardText.reset(game.world.width/2,game.world.height/2-600)
       //resume button
-      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+      resumeButton.reset(game.world.width/2 - 5, game.world.height/2);
       //restart button
-      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2+200);
       //main menu button
-      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
+      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2+400);	
       this.setVelocity(0);
     }
     else if(!game.pause){//unpause game
@@ -507,6 +512,8 @@ function pauseGame(){
 }
 
 function resumeGame(){
+	pauseBoard.kill();
+	pauseBoardText.kill();
 	resumeButton.kill();
 	restartLevelButton.kill();
 	mainMenuButton.kill();
