@@ -41,21 +41,24 @@ function line(i,length, val) {
 }
 
 gameplayState.prototype.addbackground = function(){
-  let bg = this.background.create(0,1000,'tm1');
+  let bg = this.background.create(0,1000,'tm4');
   bg.body.velocity.y = this.vel;
 //  bg.width = game.world.width;
   
-  let bg1 = this.background.create(0,500,'tm2');
+  let bg1 = this.background.create(0,500,'tm1');
   bg1.body.velocity.y = this.vel;
 //  bg1.width = game.world.width;
   
-  let bg2 = this.background.create(0,0,'tm3');
+  let bg2 = this.background.create(0,0,'tm2');
   bg2.body.velocity.y = this.vel;
 //  bg2.width = game.world.width;
   
-  let bg3 = this.background.create(0,-500,'tm4');
+  let bg3 = this.background.create(0,-500,'tm3');
   bg3.body.velocity.y = this.vel;
 //  bg3.width = game.world.width;
+  
+//  let bg4 = this.background.create(0,-1000,'tm4');
+//  bg4.body.velocity.y = this.vel; 
 }
 
 gameplayState.prototype.generateMap = function(curveFun,type)  {
@@ -92,12 +95,23 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       let val = Math.random();
       let curr = 0; 
       
+    
+      offset = distance-this.it*50;
+      if(offset<200) {
+          offset = 200;
+          this.vel += 20;
+          this.setVelocity(this.vel);
+          
+          this.background.forEach(function(item){
+              item.body.velocity.y = vel;
+          },this);
+      } 
+
       for(var j=0;j<numtimes;j++) {
         val = Math.random();
         coef = Math.sign(Math.random()*2-1);
         for(var i=0;i<5;i++) {
           var y = coef* curveFun(i,range/2,val)+50;
-//          console.log(i,y);
           var x = curr;
 
           let lwall = this.leftwall.create(y*5,-1*x*100-100,'wall');
@@ -105,13 +119,6 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
           lwall.width = 1000;
           lwall.x -=1000;
           lwall.x -=1000;
-          
-          offset = distance-this.it*50;
-          if(offset<200) {
-            offset = 200;
-            this.vel += 20;
-            this.setVelocity(this.vel);
-          } 
           
           let rwall = this.rightwall.create(y*5+offset, -1*x*100-100,'wall');
           rwall.body.velocity.y = this.vel;
@@ -315,7 +322,7 @@ gameplayState.prototype.update = function() {
 			}
 		},this);
 
-        if(this.background.children[this.bgit].body.y>=1500) {
+        if(this.background.children[this.bgit].body.y>=1499) {
           this.background.children[this.bgit].y = -500;
           this.bgit = (this.bgit + 1) % 4;
         }
@@ -342,24 +349,24 @@ gameplayState.prototype.update = function() {
           this.mapcounter += 1;
         }
   
-	if (this.mapcounter >= this.mapspercheckpoint) {
-	    //update counters
-	    this.mapcounter = 0;
-	    this.checkpointcounter += 1;
-	    
-	    //redraw progress bar
-	    this.progressbar.destroy();
-	    this.progressbar = game.add.graphics(0,0);
-	    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
-	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
-	    this.progressbar.lineStyle(2, 0x000000, 0);
-    	    this.progressbar.beginFill(this.progressbarcolor, 0.5);
-    	    let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
-    	    let progresswidth = this.progressbarwidth * progress;
-    	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
-    	    
-    	    console.log("Level progress: " + (progress * 100) + "%");
-	}
+      if (this.mapcounter >= this.mapspercheckpoint) {
+          //update counters
+          this.mapcounter = 0;
+          this.checkpointcounter += 1;
+
+          //redraw progress bar
+          this.progressbar.destroy();
+          this.progressbar = game.add.graphics(0,0);
+          this.progressbar.lineStyle(2, this.progressbarcolor, 1);
+          this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
+          this.progressbar.lineStyle(2, 0x000000, 0);
+              this.progressbar.beginFill(this.progressbarcolor, 0.5);
+              let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
+              let progresswidth = this.progressbarwidth * progress;
+              this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
+
+              console.log("Level progress: " + (progress * 100) + "%");
+      }
 
       
 	} 
@@ -435,6 +442,7 @@ gameplayState.prototype.setVelocity = function(vel) {
       item.body.velocity.y = vel;
   },this);
 }
+
 
 gameplayState.prototype.updateScore = function(arrow, deer) {    
     // Removes the deer from the screen
