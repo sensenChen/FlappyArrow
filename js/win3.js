@@ -19,7 +19,7 @@ win3.prototype.create = function() {
 
 win3.prototype.update = function() {
     if (game.input.activePointer.isDown && this.timer > this.cooldown) {
-    if (this.cutscene1.visible) {
+        if (this.cutscene1.visible) {
             this.cutscene1.visible = false;
             this.cutscene2.visible = true;
         }
@@ -27,5 +27,7 @@ win3.prototype.update = function() {
             this.cutscene2.visible = false;
             game.state.start('Menu');
         }
+        this.timer = 0;
     }
+    this.timer += 1;
 };
