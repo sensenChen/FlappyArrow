@@ -9,6 +9,7 @@ let gameplayState = function()
 	this.deerTimer = 0;
 	this.rockTimer = 2300;
 	this.cowTimer = 1200;
+	this.oneUpTimer = 0;
 	
 	//variables for slowing down arrow
 	this.isSlowed = false;
@@ -164,6 +165,10 @@ gameplayState.prototype.create = function()
 	this.cows = game.add.group();
 	this.cows.enableBody = true;
 	
+	//oneUp stuff
+	this.oneUps = game.add.group();
+	this.oneUps.enableBody = true;
+	
     //walls
     this.leftwall = game.add.group();
     this.leftwall.enableBody = true;
@@ -263,7 +268,6 @@ gameplayState.prototype.update = function() {
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
 			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
-			deer.scale.setTo(0.048,0.0853);
 			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}
@@ -283,6 +287,13 @@ gameplayState.prototype.update = function() {
 		}
 		this.cowTimer = this.cowTimer + game.time.elapsed;
 		
+		if(this.oneUpTimer >= Math.random() * 5000 + 12000){
+			let oneUp = this.oneUps.create(Math.random() * game.width/2 + game.width/4,100,'oneUp');
+			oneUp.body.velocity.y = this.vel;
+			this.oneUpTimer= 0;
+		}
+		this.oneUpTimer = this.oneUpTimer + game.time.elapsed;
+		
 		if (this.slowDownTimer >= 3500) {
 			this.isSlowed = 0;
 			this.arrow.animations.stop(null,true);
@@ -296,6 +307,7 @@ gameplayState.prototype.update = function() {
 		game.physics.arcade.overlap(this.arrow, this.deers, this.updateScore, null, this);
 		game.physics.arcade.overlap(this.arrow, this.rocks, this.updateLife, null, this);
 		game.physics.arcade.overlap(this.arrow, this.cows, this.slowDown, null, this);
+		game.physics.arcade.overlap(this.arrow, this.oneUps, this.increaseLife, null, this);
 		 
       
         if(this.wallit<this.leftwall.children.length && this.leftwall.children[this.wallit].y>500) {
@@ -342,6 +354,12 @@ gameplayState.prototype.update = function() {
           }, this);
 
           this.rightwall.forEach(function(item) {
+              if (item.body.y > game.world.height){
+                  item.destroy();
+              }
+          }, this);
+		  
+		this.oneUps.forEach(function(item) {
               if (item.body.y > game.world.height){
                   item.destroy();
               }
@@ -416,6 +434,9 @@ gameplayState.prototype.update = function() {
       this.leftwall.forEach(function(item) {
           item.destroy();
       }, this);
+	  this.oneUps.forEach(function(item) {
+          item.destroy();
+      }, this);
       this.arrow.destroy();
       button1.reset(game.world.width/2, game.world.height/2 - 100);
       mainMenuButtonFromDeath.reset(game.world.width/2, game.world.height/2 +100);
@@ -476,6 +497,15 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 	this.arrow.animations.play('flash',6,true);
 	this.slowDownTimer = 0;
     this.cowHit.play();
+}
+
+gameplayState.prototype.increaseLife = function(arrow,oneUp){
+	oneUp.destroy();
+	
+	if(this.lives < 3){
+		this.lives = this.lives + 1;
+	}
+	this.livesScoreText.text = 'Lives: ' + this.lives;
 }
 
 function restartLevel(){
