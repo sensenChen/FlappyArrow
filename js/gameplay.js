@@ -15,7 +15,6 @@ let gameplayState = function()
 	this.slowDownTimer = 0;
 	this.arrowSpeed = 7;
 	this.playDeathSound = true;
-    
 };
 
 gameplayState.prototype.preload = function()
@@ -58,7 +57,6 @@ gameplayState.prototype.addbackground = function(){
   bg3.body.velocity.y = this.vel;
 //  bg3.width = game.world.width;
 }
-
 
 gameplayState.prototype.generateMap = function(curveFun,type)  {
   let range = 60;
@@ -124,6 +122,12 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
 
 gameplayState.prototype.create = function()
 { 	
+    //level progress
+	this.mapspercheckpoint = 1;
+	this.checkpointsperlevel = 4;
+	this.mapcounter = 0;
+	this.checkpointcounter = 0;
+  
     this.wallit = 0;
     this.bgit = 0;
     this.it = 0;  
@@ -198,20 +202,25 @@ gameplayState.prototype.create = function()
 	mainMenuButtonFromDeath.kill();
 	
 	//sounds
-    this.cowHit = game.add.audio('cowHit');
+	this.cowHit = game.add.audio('cowHit');
 	this.deerHit = game.add.audio('deerHit');
 	this.loseLife = game.add.audio('loseLife');
-    this.loseLife.volume = 0.2;
-    this.deerHit.volume = 0.2;
-    this.cowHit.volume = 0.2;
+	this.loseLife.volume = 0.2;
+	this.deerHit.volume = 0.2;
+	this.cowHit.volume = 0.2;
 	this.loseGame = game.add.audio('loseGame');
 	this.backgroundSong = game.add.audio('backgroundSong');
     this.backgroundSong.loop = true;
-    this.backgroundSong.play();
+	this.backgroundSong.play()
+	
+	//progress bar initial draw
+	this.progressbarwidth = game.world.width - 100;
+	this.progressbar = game.add.graphics(0, 0);
+	this.progressbar.lineStyle(2, 0x0000FF, 1);
+	this.progressbar.drawRect(100, game.world.height - 50, this.progressbarwidth, 50);
 };
 
-gameplayState.prototype.update = function()
-{ 
+gameplayState.prototype.update = function() {
 	//while we have one or more lives
 	if (this.lives > 0 && !game.pause){
 		//arrow movement
@@ -321,7 +330,27 @@ gameplayState.prototype.update = function()
 //          this.generateMap(sincurve,0);
           this.it++;
           this.generateMap(line,1,5);
+          this.mapcounter += 1;
         }
+  
+	if (this.mapcounter >= this.mapspercheckpoint) {
+	    //update counters
+	    this.mapcounter = 0;
+	    this.checkpointcounter += 1;
+	    
+	    //redraw progress bar
+	    this.progressbar.destroy();
+	    this.progressbar = game.add.graphics(0,0);
+	    this.progressbar.lineStyle(2, 0x0000FF, 1);
+	    this.progressbar.drawRect(100, game.world.height - 50, this.progressbarwidth, 50);
+	    this.progressbar.lineStyle(2, 0x000000, 0);
+    	    this.progressbar.beginFill(0x0000FF, 0.5);
+    	    let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
+    	    let progresswidth = this.progressbarwidth * progress;
+    	    this.progressbar.drawRect(100, game.world.height - 50, progresswidth, 50);
+    	    
+    	    console.log("Level progress: " + (progress * 100) + "%");
+	}
 
       
 	} 
@@ -481,4 +510,3 @@ function goToMainMenuFromDeath(){
 	mainMenuButtonFromDeath.kill();
 	game.state.start("Menu");
 }
-
