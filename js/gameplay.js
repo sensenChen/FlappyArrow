@@ -23,6 +23,7 @@ gameplayState.prototype.preload = function()
   game.load.audio('deerHit','assets/Music&sound/Hit_deer.wav');
   game.load.audio('loseLife','assets/Music&sound/Lose_life.wav');
   game.load.audio('loseGame','assets/Music&sound/Die.wav');
+  game.load.audio('backgroundSong', 'assets/Music&sound/Music-2.wav');
 };
 
 function sincurve(i,curve) {
@@ -178,10 +179,22 @@ gameplayState.prototype.create = function()
 	mainMenuButton.anchor.set(0.5,0.5);
 	mainMenuButton.kill();
 	
+	button1 = game.add.button(game.world.width/2, game.world.height/2 - 100,
+	'restartButton', restartLevel, this, 2, 1, 0);
+	button1.anchor.set(0.5,0.5);
+	button1.kill()
+	
+	mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
+	'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
+	mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+	mainMenuButtonFromDeath.kill();
+	
 	//sounds
 	this.deerHit = game.add.audio('deerHit');
 	this.loseLife = game.add.audio('loseLife');
 	this.loseGame = game.add.audio('loseGame');
+	this.backgroundSong = game.add.audio('backgroundSong');
+	this.backgroundSong.play()
 };
 
 gameplayState.prototype.update = function()
@@ -340,13 +353,9 @@ gameplayState.prototype.update = function()
         }, this);
 		this.arrow.destroy();
 		
-		button1 = game.add.button(game.world.width/2, game.world.height/2 - 100,
-		'restartButton', restartLevel, this, 2, 1, 0);
-		button1.anchor.set(0.5,0.5);
 		
-		mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
-		'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
-		mainMenuButtonFromDeath.anchor.set(0.5,0.5);
+		button1.reset(game.world.width/2, game.world.height/2 - 100);
+		mainMenuButtonFromDeath.reset(game.world.width/2, game.world.height/2 +100);
 	}
 };
 
