@@ -16,6 +16,7 @@
     <script type="text/javascript" src="js/win2.js"></script>
     <script type="text/javascript" src="js/win3.js"></script>
     <script type="text/javascript" src="js/lose.js"></script>
+	<script type="text/javascript" src="js/beginningCutscene.js"></script>
 
     <style type="text/css">
         body {
@@ -39,6 +40,8 @@
     game.state.add("Menu", menuState)
     game.state.add("Instructions", instructionsState);
     game.state.add("Endless", endlessState);
+	game.state.add("Beginning",beginningState)
+	
     game.state.start("Menu");
 </script>
 
