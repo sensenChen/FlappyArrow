@@ -107,7 +107,11 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
           lwall.x -=1000;
           
           offset = distance-this.it*50;
-          if(offset<200) offset = 200;
+          if(offset<200) {
+            offset = 200;
+            this.vel += 20;
+            this.setVelocity(this.vel);
+          } 
           
           let rwall = this.rightwall.create(y*5+offset, -1*x*100-100,'wall');
           rwall.body.velocity.y = this.vel;
@@ -458,6 +462,10 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 function restartLevel(){
 	this.lives = 3;
 	this.score = 0;
+    this.deerTimer = 0;
+	this.cowTimer = 1200;
+	this.rockTimer = 2300;
+    this.backgroundSong.stop();
 	game.state.start("Game");
 }
 
