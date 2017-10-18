@@ -395,6 +395,7 @@ gameplayState.prototype.update = function() {
   
     //pause game
     if(game.pause){
+	  //pauseBoard stuff
 	  pauseBoard.reset(game.world.width/2,game.world.height/2);
 	  pauseBoardText.reset(game.world.width/2,game.world.height/2-600)
       //resume button
