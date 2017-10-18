@@ -214,10 +214,10 @@ gameplayState.prototype.create = function()
 	this.backgroundSong.play()
 	
 	//progress bar initial draw
-	this.progressbarwidth = game.world.width - 100;
+	this.progressbarcolor = 0x208456;
 	this.progressbar = game.add.graphics(0, 0);
-	this.progressbar.lineStyle(2, 0x0000FF, 1);
-	this.progressbar.drawRect(100, game.world.height - 50, this.progressbarwidth, 50);
+	this.progressbar.lineStyle(2, this.progressbarcolor, 1);
+	this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
 };
 
 gameplayState.prototype.update = function() {
@@ -341,13 +341,13 @@ gameplayState.prototype.update = function() {
 	    //redraw progress bar
 	    this.progressbar.destroy();
 	    this.progressbar = game.add.graphics(0,0);
-	    this.progressbar.lineStyle(2, 0x0000FF, 1);
-	    this.progressbar.drawRect(100, game.world.height - 50, this.progressbarwidth, 50);
+	    this.progressbar.lineStyle(2, this.progressbarcolor, 1);
+	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, this.progressbarwidth, this.progressbarheight);
 	    this.progressbar.lineStyle(2, 0x000000, 0);
-    	    this.progressbar.beginFill(0x0000FF, 0.5);
+    	    this.progressbar.beginFill(this.progressbarcolor, 0.5);
     	    let progress = this.checkpointcounter * 1.0 / this.checkpointsperlevel
     	    let progresswidth = this.progressbarwidth * progress;
-    	    this.progressbar.drawRect(100, game.world.height - 50, progresswidth, 50);
+    	    this.progressbar.drawRect(this.progressbarleftpadding, game.world.height - this.progressbarheight - this.progressbarbottompadding, progresswidth, this.progressbarheight);
     	    
     	    console.log("Level progress: " + (progress * 100) + "%");
 	}
