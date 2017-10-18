@@ -1,0 +1,57 @@
+Story
+
+During the 11th century, Hatfield Forest served as the hunting grounds for the King and his favorites. As the right to hunt in these forests was in the hands of royalty, it was forbidden for anyone else to hunt there.
+
+Yet one day, a soldier who prided himself on skill with a bow came to his liege, and asked of his lord for permission to hunt. His family had little to eat, and his time in service to the king felt enough to him to be rewarded with the right to hunt.
+
+The king, of course, denied him, for his service, while exemplary, was not quite enough. Yet the soldier was not going to give up. He suggested, perhaps, that he could compete with the other favorites of the king, that he might prove himself just as capable as they of service.
+
+Yet again, the king was unsure of this, but his favorites were up for the competition, and were interested to see how the soldier's archery would match up to their own. And so, the stage was set for this would-be hunter to test his skills!
+
+---
+
+Directions
+
+Guide the arrow to hit as many deer as you can by dragging across the screen.
+
+Hitting deer will award score and don't break your arrow, so hit as many as you can.
+Don't think too much about why your arrows can pierce multiple deer just fine.
+
+Hitting trees and rocks will break your arrow, and you only have a limited number of arrows.
+
+There are some leftover arrows scattered about. Hitting them will give you an extra arrow.
+
+Hitting grazing cattle won't break your arrow, but will slow it down for a time.
+You're here to hunt deer, not murder cattle, after all.
+
+Heavy brush will serve as a checkpoint. Breaking an arrow will take you back to the last checkpoint.
+
+---
+
+Ending (Part 1)
+
+As the sun set, the soldier took count of his kills, and had the deer brought back to be compared to those the king's favorites had gotten. And upon measuring them...
+
+---
+
+Bad Ending
+
+...The soldier's were not enough. Having not earned the right to hunt in the forest, the deer that he had slain were to be for the royal dining table that evening, and the soldier would go home empty-handed. His family was just going to have to make do.
+
+Bad Ending- Try again and go for more deer!
+
+---
+
+Good Ending
+
+...The soldier had done it! He had outdone the king's closest friends and proved his capability to his lordship. Despite the unusual circumstances of the challenge, nonetheless the soldier was given the right to hunt in the grounds, with the caveat that at least some portion of it was to be for the royal dining table. It was a fair enough bargain, enough to help feed the soldier's family. For the first night in the last few years, happy cheers came from the soldier's home, and they had a small feast of their own in celebration for their good fortune.
+
+Good Ending- Congratulations! Cleared as expected!
+
+---
+
+Worst Ending (No kills)
+
+As the sun set, the soldier looked down at himself in shame. Not a single deer was bagged, and he was out of time. Disgraced, rather than face his king, he resigned from the military, his skill having clearly waned. Without a job, he would have to find some other calling in life, and soon, for every day without pay, it was a day closer to his family's utter ruin...
+
+Worst Ending- You had to have gotten this on purpose, didn't you?
