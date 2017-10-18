@@ -15,6 +15,7 @@ let gameplayState = function()
 	this.slowDownTimer = 0;
 	this.arrowSpeed = 7;
 	this.playDeathSound = true;
+    
 };
 
 gameplayState.prototype.preload = function()
@@ -42,19 +43,19 @@ function line(i,length, val) {
 
 gameplayState.prototype.addbackground = function(){
   let bg = this.background.create(0,1000,'tm1');
-  bg.body.velocity.y = 600;
+  bg.body.velocity.y = this.vel;
 //  bg.width = game.world.width;
   
   let bg1 = this.background.create(0,500,'tm2');
-  bg1.body.velocity.y = 600;
+  bg1.body.velocity.y = this.vel;
 //  bg1.width = game.world.width;
   
   let bg2 = this.background.create(0,0,'tm3');
-  bg2.body.velocity.y = 600;
+  bg2.body.velocity.y = this.vel;
 //  bg2.width = game.world.width;
   
   let bg3 = this.background.create(0,-500,'tm4');
-  bg3.body.velocity.y = 600;
+  bg3.body.velocity.y = this.vel;
 //  bg3.width = game.world.width;
 }
 
@@ -79,40 +80,44 @@ gameplayState.prototype.generateMap = function(curveFun,type)  {
       var x = i/slice;
 
       let lwall = this.leftwall.create(y*stride+offset,-1*x*100-100,'wall');
-      lwall.body.velocity.y = 600;
+      lwall.body.velocity.y = this.vel;
       lwall.width = 1000;
       lwall.x -=1000;
       lwall.x -=1000;
 
       let rwall = this.rightwall.create(y*stride+distance+offset, -1*x*100-100,'wall');
-      rwall.body.velocity.y = 600;
+      rwall.body.velocity.y = this.vel;
       rwall.width = 1000;
       rwall.x +=1000;
     }
   } else {
       let val = Math.random();
-      let curr = 0;  
+      let curr = 0; 
+      
       for(var j=0;j<numtimes;j++) {
         val = Math.random();
         coef = Math.sign(Math.random()*2-1);
-        for(var i=0;i<10;i++) {
+        for(var i=0;i<5;i++) {
           var y = coef* curveFun(i,range/2,val)+50;
 //          console.log(i,y);
           var x = curr;
 
           let lwall = this.leftwall.create(y*5,-1*x*100-100,'wall');
-          lwall.body.velocity.y = 600;
+          lwall.body.velocity.y = this.vel;
           lwall.width = 1000;
           lwall.x -=1000;
           lwall.x -=1000;
-
-          let rwall = this.rightwall.create(y*5+distance, -1*x*100-100,'wall');
-          rwall.body.velocity.y = 600;
+          
+          offset = distance-this.it*50;
+          if(offset<200) offset = 200;
+          
+          let rwall = this.rightwall.create(y*5+offset, -1*x*100-100,'wall');
+          rwall.body.velocity.y = this.vel;
           rwall.width = 1000;
           rwall.x +=1000;
           curr++;
         } 
-        curr+=1;
+        curr+=2;
       }
   }
 }
@@ -121,7 +126,9 @@ gameplayState.prototype.create = function()
 { 	
     this.wallit = 0;
     this.bgit = 0;
-    
+    this.it = 0;  
+    this.vel = 600;
+  
     //background
     this.background = game.add.group();
     this.background.enableBody = true;
@@ -199,7 +206,8 @@ gameplayState.prototype.create = function()
     this.cowHit.volume = 0.2;
 	this.loseGame = game.add.audio('loseGame');
 	this.backgroundSong = game.add.audio('backgroundSong');
-	this.backgroundSong.play();
+    this.backgroundSong.loop = true;
+    this.backgroundSong.play();
 };
 
 gameplayState.prototype.update = function()
@@ -227,21 +235,21 @@ gameplayState.prototype.update = function()
 			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer',0);
 			let anim = deer.animations.add('walk');
 			deer.animations.play('walk',5,true);
-			deer.body.velocity.y = 600;
+			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}
 		this.deerTimer = this.deerTimer + game.time.elapsed;
 		
 		if (this.rockTimer >= Math.random() * 2000 + 3000){
 			let rock = this.rocks.create(Math.random() * game.width/2 + game.width/4,100,'rock');
-			rock.body.velocity.y = 600;
+			rock.body.velocity.y = this.vel;
 			this.rockTimer = 0;
 		}
 		this.rockTimer = this.rockTimer + game.time.elapsed;
 		
 		if (this.cowTimer >= Math.random() * 2000 + 5000){
 			let cow = this.cows.create(Math.random() * game.width/2 + game.width/4,100,'cow');
-			cow.body.velocity.y = 600;
+			cow.body.velocity.y = this.vel;
 			this.cowTimer = 0;
 		}
 		this.cowTimer = this.cowTimer + game.time.elapsed;
@@ -310,23 +318,29 @@ gameplayState.prototype.update = function()
               }
           }, this);
           this.wallit = 0;
-          this.generateMap(sincurve,0);
+//          this.generateMap(sincurve,0);
+          this.it++;
+          this.generateMap(line,1,5);
         }
 
-      //pause game
-      if (game.pause){
-        //resume button
-        resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
-        //restart button
-        restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
-        //main menu button
-        mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
-        this.setVelocity(0);
-      }
-      else if(!game.pause){//unpause game
-        this.setVelocity(600);
-      }
-	} else {
+      
+	} 
+  
+    //pause game
+    if (game.pause){
+      //resume button
+      resumeButton.reset(game.world.width/2 - 5, game.world.height/2-200);
+      //restart button
+      restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2);
+      //main menu button
+      mainMenuButton.reset(game.world.width/2 - 5,game.world.height/2 + 200);	
+      this.setVelocity(0);
+    }
+    else if(!game.pause){//unpause game
+      this.setVelocity(this.vel);
+    }
+  
+    if(this.lives==0) {
       this.setVelocity(0);
       if(this.playDeathSound){
           this.loseGame.play();
@@ -352,17 +366,10 @@ gameplayState.prototype.update = function()
           item.destroy();
       }, this);
       this.arrow.destroy();
-      
-//      button1 = game.add.button(game.world.width/2, game.world.height/2 - 100,
-//      'restartButton', restartLevel, this, 2, 1, 0);
-//      button1.anchor.set(0.5,0.5);
-//
-//      mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100,
-//      'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
-//      mainMenuButtonFromDeath.anchor.set(0.5,0.5);
       button1.reset(game.world.width/2, game.world.height/2 - 100);
       mainMenuButtonFromDeath.reset(game.world.width/2, game.world.height/2 +100);
     }
+  
 };
 
 gameplayState.prototype.setVelocity = function(vel) {    
@@ -433,7 +440,8 @@ function restartLevelFromPause(){
 	this.cowTimer = 1200;
 	this.rockTimer = 2300;
 	this.pauseGame = false;
-	game.state.restart();
+    this.backgroundSong.stop();
+	game.state.start("Game");
 }
 
 function pauseGame(){
@@ -460,6 +468,7 @@ function goToMainMenu(){
 	this.lives = 3;
 	this.score = 0;
 	game.pause = false;
+    this.backgroundSong.stop();
 	game.state.start("Menu");
 }
 
