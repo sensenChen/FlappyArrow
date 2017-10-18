@@ -7,8 +7,8 @@ let preloadState = function()
 //when Phaser creates an instance of this state, we want it to
 preloadState.prototype.preload = function()
 {
-    game.load.image('arrow', 'assets/arro.png');
-	game.load.image('deer', 'assets/deer.png');
+    game.load.spritesheet('arrow', 'assets/arro.png',64,64,2);
+	game.load.spritesheet('deer', 'assets/Deer.png',64,64,2);
 	game.load.image('rock', 'assets/rock.png');
 	game.load.image('cow', 'assets/cow.png');
     game.load.image('wall', 'assets/wall.png');
@@ -19,6 +19,8 @@ preloadState.prototype.preload = function()
     game.load.image('tm1','assets/tm1.png');
     game.load.image('tm2','assets/tm2.png');
     game.load.image('tm3','assets/tm2.png');
+	
+	
 	
 };  
 

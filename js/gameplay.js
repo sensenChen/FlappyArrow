@@ -136,6 +136,8 @@ gameplayState.prototype.create = function()
 	game.physics.enable(this.arrow, Phaser.Physics.ARCADE);
 	this.arrow.body.gravity.y = 0;
 	this.arrow.body.collideWorldBounds = true;
+	this.arrow.body.setSize(20,64,20,0);
+	this.arrow.animations.add('flash');
 	
 	//deer stuff
 	this.deers = game.add.group();
@@ -210,7 +212,9 @@ gameplayState.prototype.update = function()
 		
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
-			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
+			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer',0);
+			let anim = deer.animations.add('walk');
+			deer.animations.play('walk',5,true);
 			deer.body.velocity.y = 600;
 			this.deerTimer = 0;
 		}
@@ -232,6 +236,7 @@ gameplayState.prototype.update = function()
 		
 		if (this.slowDownTimer >= 3500) {
 			this.isSlowed = 0;
+			this.arrow.animations.stop(null,true);
 			this.slowDownTimer = 0;
 		}
 		else {
@@ -427,6 +432,7 @@ gameplayState.prototype.slowDown = function(arrow, cow){
 		
 	//Indicate that you are slowed
 	this.isSlowed = true;
+	this.arrow.animations.play('flash',6,true);
 	this.slowDownTimer = 0;
 	
 }
