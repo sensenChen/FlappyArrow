@@ -214,6 +214,11 @@ gameplayState.prototype.create = function()
 	this.backgroundSong.play()
 	
 	//progress bar initial draw
+	this.progressbarleftpadding = 64;
+	this.progressbarrightpadding = 16;
+	this.progressbarbottompadding = 16;
+	this.progressbarheight = 40;
+	this.progressbarwidth = game.world.width - this.progressbarleftpadding - this.progressbarrightpadding;
 	this.progressbarcolor = 0x208456;
 	this.progressbar = game.add.graphics(0, 0);
 	this.progressbar.lineStyle(2, this.progressbarcolor, 1);
