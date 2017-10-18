@@ -262,9 +262,8 @@ gameplayState.prototype.update = function() {
 		
 		//create a deer every 5 seconds
 		if (this.deerTimer >= Math.random() * 2000 + 6000){
-			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer',0);
-			let anim = deer.animations.add('walk');
-			deer.animations.play('walk',5,true);
+			let deer = this.deers.create(Math.random() * game.width/2 + game.width/4,100,'deer');
+			deer.scale.setTo(0.048,0.0853);
 			deer.body.velocity.y = this.vel;
 			this.deerTimer = 0;
 		}

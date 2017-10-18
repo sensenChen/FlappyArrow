@@ -8,7 +8,7 @@ let preloadState = function()
 preloadState.prototype.preload = function()
 {
     game.load.spritesheet('arrow', 'assets/Arrow.png',64,64,2);
-	game.load.spritesheet('deer', 'assets/Deer.png',64,64,2);
+	game.load.spritesheet('deer', 'assets/Deer.png');
 	game.load.image('rock', 'assets/rock.png');
 	game.load.image('cow', 'assets/cow.png');
     game.load.image('wall', 'assets/wall.png');
