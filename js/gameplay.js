@@ -26,6 +26,7 @@ gameplayState.prototype.preload = function()
   game.load.audio('loseGame','assets/Music&sound/Die.wav');
   game.load.audio('cowHit','assets/Music&sound/Hit_cow.wav');
   game.load.audio('backgroundSong', 'assets/Music&sound/Music-2.wav');
+  game.load.audio('gotOneUp','assets/Music&sound/Pickup_life.wav');
 };
 
 function sincurve(i,curve) {
@@ -230,6 +231,7 @@ gameplayState.prototype.create = function()
 	this.deerHit.volume = 0.2;
 	this.cowHit.volume = 0.2;
 	this.loseGame = game.add.audio('loseGame');
+	this.gotOneUp = game.add.audio('gotOneUp');
 	this.backgroundSong = game.add.audio('backgroundSong');
     this.backgroundSong.loop = true;
 	this.backgroundSong.play()
@@ -504,6 +506,7 @@ gameplayState.prototype.increaseLife = function(arrow,oneUp){
 	oneUp.destroy();
 	
 	if(this.lives < 3){
+		this.gotOneUp.play();
 		this.lives = this.lives + 1;
 	}
 	this.livesScoreText.text = 'Lives: ' + this.lives;
