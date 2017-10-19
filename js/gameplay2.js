@@ -2,7 +2,7 @@
 let gameplayState2 = function() {
     //ui variables
     this.deerScore = 0;
-    this.lives = 500;
+    this.lives = 3;
     
     //timer variables
     this.deerTimer = 0;
@@ -11,18 +11,19 @@ let gameplayState2 = function() {
     this.oneUpTimer = 0;
     
     //tree and checkpoint variables
-    this.treeInterval = 500; //interval in between tree generation
-    this.numTreesPerInterval = 0; //number of trees at each generation
-    this.treespercheckpoint = 10; //number of tree generations to reach the next checkpoint
+    this.treeInterval = 700; //interval in between tree generation
+    this.numTreesPerInterval = 1; //number of trees at each generation
+    this.maxTreesPerInterval = 5; //max number of trees per generation
+    this.treespercheckpoint = 30; //number of tree generations to reach the next checkpoint
     this.checkpointsperlevel = 4; //number of checkpoints to complete the level
-    this.levellength = 500; //basically the total number of tree generations in the level
+    this.levellength = this.treespercheckpoint * this.checkpointsperlevel; //basically the total number of tree generations in the level
     
     //counters
     this.treeTimer = 0;
     this.treecounter = 0;
     this.checkpointcounter = 0;
     this.levelprogress = 0;
-    this.difficulty = 20;
+    this.difficulty = 0;
     this.totalDeer = 0;
     
     //variables for slowing down arrow
@@ -216,26 +217,26 @@ gameplayState2.prototype.create = function() {
     pauseBoardText.anchor.set(0.5, 0,5);
     pauseBoardText.kill();
     
-    pauseButton = game.add.button(0, game.world.height-64, 'pauseButton', pauseGame, this, 2, 1, 0);
+    pauseButton = game.add.button(0, game.world.height-64, 'pauseButton', this.pauseGame, this, 2, 1, 0);
     pauseButton.scale.setTo(.512, .481)
     
-    restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300, 'restartButton', restartPause, this, 2, 1, 0);
+    restartLevelButton = game.add.button(game.world.width/2, game.world.height/2-300, 'restartButton', this.restartPause, this, 2, 1, 0);
     restartLevelButton.anchor.set(0.5, 0.5);
     restartLevelButton.kill();
     
-    resumeButton = game.add.button(game.world.width/2, game.world.height/2-300, 'resumeButton', resumeGame, this, 2, 1, 0);
+    resumeButton = game.add.button(game.world.width/2, game.world.height/2-300, 'resumeButton', this.resumeGame, this, 2, 1, 0);
     resumeButton.anchor.set(0.5, 0.5);
     resumeButton.kill();
     
-    mainMenuButton = game.add.button(game.world.width/2, game.world.height/2-300, 'mainMenuButton', goToMainMenu, this, 2, 1, 0);
+    mainMenuButton = game.add.button(game.world.width/2, game.world.height/2-300, 'mainMenuButton', this.goToMainMenu, this, 2, 1, 0);
     mainMenuButton.anchor.set(0.5, 0.5);
     mainMenuButton.kill();
     
-    button1 = game.add.button(game.world.width/2, game.world.height/2 - 100, 'restartButton', restartThisLevel, this, 2, 1, 0);
+    button1 = game.add.button(game.world.width/2, game.world.height/2 - 100, 'restartButton', this.restartThisLevel, this, 2, 1, 0);
     button1.anchor.set(0.5,0.5);
     button1.kill()
     
-    mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100, 'mainMenuButton', goToMainMenuFromDeath, this, 2, 1, 0);
+    mainMenuButtonFromDeath = game.add.button(game.world.width/2, game.world.height/2+100, 'mainMenuButton', this.goToMainMenuFromDeath, this, 2, 1, 0);
     mainMenuButtonFromDeath.anchor.set(0.5,0.5);
     mainMenuButtonFromDeath.kill();
     
@@ -338,7 +339,7 @@ gameplayState2.prototype.update = function() {
             this.difficulty +=1;
             
             console.log(this.difficulty);
-            if(this.difficulty%30==0 && this.numTreesPerInterval<4) {
+            if(this.difficulty % 30 == 0 && this.numTreesPerInterval < this.maxTreesPerInterval) {
               this.numTreesPerInterval++;
             }
             
@@ -477,7 +478,6 @@ gameplayState2.prototype.update = function() {
         
         //restart button
         restartLevelButton.reset(game.world.width/2 - 5, game.world.height/2+200);
-		console.log(restartLevelButton);
         
         //main menu button
         mainMenuButton.reset(game.world.width/2 - 5, game.world.height/2+400);
@@ -583,12 +583,18 @@ gameplayState2.prototype.restartfromlastcheckpoint = function() {
     this.updateprogressbar();
     this.deerScore = this.lastscore;
     this.deerScoreText.text = 'Score: ' + this.deerScore;
+    this.totalDeer = this.lasttotaldeer;
+    this.difficulty = this.lastdifficulty;
+    this.numTreesPerInterval = this.lastTPI;
 }
 
 //called when a checkpoint is reached, updates saved values
 gameplayState2.prototype.checkpointreached = function() {
     this.lastprogress = this.levelprogress;
     this.lastscore = this.deerScore;
+    this.lasttotaldeer = this.totalDeer;
+    this.lastdifficulty = this.difficulty;
+    this.lastTPI = this.numTreesPerInterval;
     console.log("checkpoint");
 }
 
@@ -631,16 +637,23 @@ gameplayState2.prototype.updateprogressbar = function() {
 
 //called when the level is finished
 gameplayState2.prototype.finishlevel = function() {
-  //movestate to blah
-  //increase game speed
-  //check if you get .75% of total deers 80% 85%
-//  if(this.totalDeer*.80>this.score) {
-//     //lose
-//    game.state.start("Lose");
-//  } else {
-    //win 
-    game.state.start("Win2");
-//  }
+    //increase game speed
+    //check if you get .75% of total
+    if (this.deerScore == 0) {
+        this.resetCounters();
+        game.result = "Worst";
+        game.state.start("Lose");
+    }
+    else if (this.totalDeer * .75 > this.deerScore) {
+        this.resetCounters();
+        game.result = "Bad";
+        game.state.start("Lose");
+    }
+    else {
+        this.resetCounters();
+        game.result = "Good";
+        game.state.start("Win2");
+    }
 }
 
 //called when a oneup is hit, removes the oneup and increments lives with a cap of 3
@@ -655,61 +668,57 @@ gameplayState2.prototype.increaseLife = function(arrow, oneUp){
 }
 
 gameplayState2.prototype.moveSprites = function(object1,object2){
-	object2.body.x = object2.body.x + 64;
+    object2.body.x = object2.body.x + 64;
 }
 
-//called when restart button is clicked from game over menu, restarts the game state
-//function restartLevel() {
-//
-//}
-
-function restartThisLevel() {
+//reset all the counters
+gameplayState2.prototype.resetCounters = function() {
     this.lives = 3;
-    this.score = 0;
+    this.deerScore = 0;
+    
     this.deerTimer = 0;
     this.cowTimer = 1200;
     this.rockTimer = 2300;
-    this.backgroundSong.stop();
+    this.treeTimer = 0;
+    
+    this.treecounter = 0;
+    this.checkpointcounter = 0;
     this.levelprogress = 0;
+    this.difficulty = 0;
+    
+    this.lastprogress = 0;
+    this.lastscore = 0;
+    
     this.totalDeer = 0;
-    game.state.start("Game");
+    
+    this.numTreesPerInterval = 1;
+    
+    console.log("counters resetted");
+}
+
+gameplayState2.prototype.restartThisLevel = function() {
+    this.resetCounters();
+    this.backgroundSong.stop();
+    game.state.start("Game2");
 }
 
 
-function restartPause() {
-    this.lives = 3;
-    this.score = 0;
+gameplayState2.prototype.restartPause = function() {
+    this.resetCounters();
+    
     game.pause = false;
-    this.deerTimer = 0;
-    this.cowTimer = 1200;
-    this.rockTimer = 2300;
     this.pauseGame = false;
-    this.levelprogress = 0;
     this.backgroundSong.stop();
-    this.totalDeer = 0;
-    game.state.start("Game");
+    game.state.start("Game2");
 }
-//
-////called when restart button is clicked from pause menu, restarts the game state
-//function restartLevelFromPause() {
-////    this.lives = 3;
-////    this.score = 0;
-////    game.pause = false;
-////    this.deerTimer = 0;
-////    this.cowTimer = 1200;
-////    this.rockTimer = 2300;
-////    this.pauseGame = false;
-////    this.backgroundSong.stop();
-////    game.state.start("Game");
-//}
 
 //called when the pause button is clicked, pauses the game
-function pauseGame() {
+gameplayState2.prototype.pauseGame = function() {
     game.pause = true;
 }
 
 //called when the resume button is clicked from the pause menu, removes the pause menu and resumes gameplay
-function resumeGame() {
+gameplayState2.prototype.resumeGame = function() {
     pauseBoard.kill();
     pauseBoardText.kill();
     resumeButton.kill();
@@ -722,29 +731,21 @@ function resumeGame() {
 }
 
 //called when menu button is clicked from the pause menu, switches to the menu state
-function goToMainMenu(){
+gameplayState2.prototype.goToMainMenu = function() {
     resumeButton.kill();
     restartLevelButton.kill();
     mainMenuButton.kill();
-    this.deerTimer = 0;
-    this.cowTimer = 1200;
-    this.rockTimer = 2300;
-    this.lives = 3;
-    this.score = 0;
-    this.totalDeer = 0;
+    
+    this.resetCounters();
+    
     game.pause = false;
     this.backgroundSong.stop();
     game.state.start("Menu");
 }
 
 //called when menu button is clicked from the game over menu, switches to the menu state
-function goToMainMenuFromDeath(){
-    this.lives = 3;
-    this.score = 0;
-    this.deerTimer = 0;
-    this.cowTimer = 1200;
-    this.rockTimer = 2300;
-    this.totalDeer = 0;
+gameplayState2.prototype.goToMainMenuFromDeath = function() {
+    this.resetCounters();
     mainMenuButtonFromDeath.kill();
     game.state.start("Menu");
 }
